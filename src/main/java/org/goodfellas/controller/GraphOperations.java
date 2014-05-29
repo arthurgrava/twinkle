@@ -5,8 +5,8 @@ import org.goodfellas.model.Graph;
 
 public class GraphOperations {
 
-	public Graph initialize() {
-
+	public void initialize() {
+		//Graph
 	}
 
 }

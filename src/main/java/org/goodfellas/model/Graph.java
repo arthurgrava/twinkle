@@ -35,17 +35,18 @@ public class Graph {
 
 	}
 
-	public addVertice(Vertice vertice) {
+	public void addVertice(Vertice vertice) {
 
-		vertices.put( vertice );
+		vertices.put( vertice.getId(), vertice );
 		this.numVertices++;
-		this.numEdges += vertices.getEdges.size();
+		this.numEdges += vertice.getEdges().size();
 
 	}
 
 	@Override
 	public String toString() {
 		//TODO
+		return null;
 	}
 
 

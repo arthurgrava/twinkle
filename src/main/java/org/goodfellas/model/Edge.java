@@ -8,9 +8,9 @@ public class Edge {
 
 	private Vertice verticeFrom;
 	private Vertice verticeTo;
-	private int value;
+	private double value;
 
-	public Edge(Vertice verticeFrom, Vertice verticeTo, int value) {
+	public Edge(Vertice verticeFrom, Vertice verticeTo, double value) {
 
 		this.verticeFrom = verticeFrom;
 		this.verticeTo = verticeTo;
@@ -19,11 +19,11 @@ public class Edge {
 	}
 
 
-	public int getValue() {
+	public double getValue() {
 		return this.value;
 	}
 
-	public void setValue(int value) {
+	public void setValue(double value) {
 		this.value = value;
 	}
 

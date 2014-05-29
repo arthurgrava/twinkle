@@ -17,8 +17,8 @@ public class Vertice {
 	public Vertice(int id, int x, int y) {
 
 		this.id = id;
-		this.x = x
-		this.y = y
+		this.x = x;
+		this.y = y;
 
 		this.edges = new ArrayList<Edge>();
 
@@ -27,20 +27,20 @@ public class Vertice {
 	public Vertice(int id, int x, int y, List<Edge> edges) {
 
 		this.id = id;
-		this.x = x
-		this.y = y
+		this.x = x;
+		this.y = y;
 
 		this.edges = edges;
 
 	}
 
 
-	public add(Graph graph, Vertice vertice) {
+	public void add(Graph graph, Vertice vertice) {
 
 		if (graph == null) throw new IllegalArgumentException("Graph must not be null.");
 		if (vertice == null) throw new IllegalArgumentException("Vertice must not be null.");
 
-		int value = Utils.euclideanDistance(this.getX(), vertice.getX(), this.getY(), vertice.getY());
+		double value = Utils.euclideanDistance(this.getX(), vertice.getX(), this.getY(), vertice.getY());
 
 		Edge edge = new Edge(this, vertice, value);
 
@@ -75,11 +75,11 @@ public class Vertice {
 		this.y = y;
 	}
 
-	public List<Edge> setEdges() {
+	public List<Edge> getEdges() {
 		return edges;
 	}
 
-	public void getEdges(List<Edge> edges) {
+	public void setEdges(List<Edge> edges) {
 		this.edges = edges;
 	}
 
