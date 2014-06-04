@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.lang.IllegalArgumentException;
 
 import org.goodfellas.model.Vertice;
-import org.goodfellas.model.Edge;
-
 
 public class Graph {
 
@@ -15,6 +13,9 @@ public class Graph {
 
 	private int numEdges;
 	private int numVertices;
+	
+	private int origin;
+	private int destination;
 
 	public Graph() {
 
@@ -45,8 +46,16 @@ public class Graph {
 
 	@Override
 	public String toString() {
-		//TODO
-		return null;
+	    String line = "";
+	    for(Integer key : vertices.keySet()) {
+	        line += this.vertices.get(key).toString();
+	    }
+		return line;
+	}
+	
+	public String toHtml() {
+	    // TODO - Rafa, here you can convert the graph to html
+	    return null;
 	}
 
 
@@ -73,5 +82,21 @@ public class Graph {
 	public void setNumVertices(int numVertices) {
 		this.numVertices = numVertices;
 	}
+
+    public int getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(int origin) {
+        this.origin = origin;
+    }
+
+    public int getDestination() {
+        return destination;
+    }
+
+    public void setDestination(int destination) {
+        this.destination = destination;
+    }
 
 }

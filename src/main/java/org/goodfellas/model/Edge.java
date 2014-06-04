@@ -1,9 +1,5 @@
 package org.goodfellas.model;
 
-import java.util.Map;
-import java.util.HashMap;
-
-
 public class Edge {
 
 	private Vertice verticeFrom;

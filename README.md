@@ -19,3 +19,13 @@ or
 ```
 $ sbt package compile run
 ```
+
+or
+```
+$ mvn clean install
+```
+
+## Running the project
+```
+$ java -jar twinkle.jar < input/one.txt
+```

@@ -1,13 +1,18 @@
 package org.goodfellas;
 
+import org.goodfellas.controller.GraphLoader;
+import org.goodfellas.model.Graph;
+
 /**
  * Hello world!
  *
  */
-public class App 
-{
+public class App {
+    
     public static void main( String[] args )
     {
-        System.out.println( "Hello World!" );
+        final GraphLoader gl = new GraphLoader();
+        Graph graph = gl.loadFromFile();
+        System.out.println(graph.toString());
     }
 }
