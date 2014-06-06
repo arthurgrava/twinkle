@@ -49,12 +49,20 @@ public class Vertice {
         graph.addVertice(vertice);
 
     }
-
+    
+    public Vertice[] getAdjacent() {
+        Vertice[] adj = new Vertice[this.edges.size()];
+        for(int i = 0 ; i < this.edges.size() ; i++) {
+            adj[i] = this.edges.get(i).getVerticeTo();
+        }
+        return adj;
+    }
+    
     @Override
     public String toString() {
-        String line = "[" + this.getId() + "," + this.getX() + "," + this.getY() + "]";
+        String line = "vertex[" + this.getId() + "," + this.getX() + "," + this.getY() + "]";
         if(this.edges.size() > 0) {
-            line += " -> [";
+            line += " -> edges[";
             for(Edge e : this.edges) {
                 line += e.getVerticeTo().getId() + "(" + e.getValue() + "),";
             }

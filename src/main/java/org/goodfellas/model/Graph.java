@@ -46,7 +46,7 @@ public class Graph {
 
 	@Override
 	public String toString() {
-	    String line = "";
+	    String line = this.getNumVertices() + " vertices\n";
 	    for(Integer key : vertices.keySet()) {
 	        line += this.vertices.get(key).toString();
 	    }
@@ -76,7 +76,7 @@ public class Graph {
 	}
 
 	public int getNumVertices() {
-		return numVertices;
+		return this.vertices.size();
 	}
 
 	public void setNumVertices(int numVertices) {
