@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 import org.goodfellas.util.Utils;
 
-
 public class Vertice {
 
     private int id;

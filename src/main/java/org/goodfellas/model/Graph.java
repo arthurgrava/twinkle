@@ -1,9 +1,9 @@
 package org.goodfellas.model;
 
+import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.lang.IllegalArgumentException;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
