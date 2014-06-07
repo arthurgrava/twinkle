@@ -31,11 +31,13 @@ public class GraphOperations {
         
         while(dest != origin) {
             Node node = map.get(dest);
-            if(node.pi == null)
+            if(node.pi == null) {
                 path.add(new Edge(vertices.get(origin), vertices.get(dest), 1));
-            else 
+                dest = origin;
+            } else { 
                 path.add(new Edge(vertices.get(node.pi.id), vertices.get(dest), 1));
-            dest = node.pi.id;
+                dest = node.pi.id;
+            }
         }
         
         return path;
