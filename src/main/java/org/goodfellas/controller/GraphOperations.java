@@ -12,18 +12,25 @@ import org.goodfellas.model.Vertice;
 
 public class GraphOperations {
 
-    public void printPath(final List<Edge> path, final Node last) {
-        for(int i = path.size() - 1 ; i >= 0 ; i--) {
-            Edge e = path.get(i);
-            System.out.println(e.getVerticeFrom().getId() + " " + e.getVerticeTo().getId());
+    public void printPath(final List<Edge> path, final Node destination, final Node origin) {
+        if(!path.isEmpty()) {
+            if(path.get(path.size() - 1).getVerticeFrom().getId() != origin.id) {
+                System.out.println("There is no path between " + origin.id + " and " + destination.id);
+                return;
+            }
+            for(int i = path.size() - 1 ; i >= 0 ; i--) {
+                Edge e = path.get(i);
+                System.out.println(e.getVerticeFrom().getId() + " " + e.getVerticeTo().getId());
+            }
+            System.out.println();
+            System.out.printf("%.1f\n", destination.distance);
+        } else {
+            System.out.println("There is no path between " + origin.id + " and " + destination.id);
         }
-        System.out.println();
-        System.out.printf("%.1f\n", last.distance); 
     }
     
-    public List<Edge> retrievePath(final Graph graph, final List<Node> nodes) {
+    public List<Edge> retrievePath(final Graph graph, final List<Node> nodes, final Map<Integer, Node> map) {
         List<Edge> path = new ArrayList<Edge>(graph.getNumVertices());
-        Map<Integer, Node> map = getNodeMap(nodes);
         Map<Integer, Vertice> vertices = graph.getVertices();
         
         int origin = graph.getOrigin();
@@ -32,7 +39,6 @@ public class GraphOperations {
         while(dest != origin) {
             Node node = map.get(dest);
             if(node.pi == null) {
-                path.add(new Edge(vertices.get(origin), vertices.get(dest), 1));
                 dest = origin;
             } else { 
                 path.add(new Edge(vertices.get(node.pi.id), vertices.get(dest), 1));
@@ -43,7 +49,7 @@ public class GraphOperations {
         return path;
     }
 
-    private Map<Integer, Node> getNodeMap(final List<Node> nodes) {
+    public Map<Integer, Node> getNodeMap(final List<Node> nodes) {
         Map<Integer, Node> map = new HashMap<Integer, Node>();
         for(Node node : nodes) {
             map.put(node.id, node);

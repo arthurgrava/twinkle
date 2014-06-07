@@ -1,6 +1,7 @@
 package org.goodfellas;
 
 import java.util.List;
+import java.util.Map;
 
 import org.goodfellas.algorithm.Dijkstra;
 import org.goodfellas.algorithm.Dijkstra.Node;
@@ -25,7 +26,8 @@ public class App {
         dij.execute();
         List<Node> nodes = dij.getPath();
         
-        List<Edge> path = go.retrievePath(graph, nodes);
-        go.printPath(path, nodes.get(nodes.size() - 1));
+        Map<Integer, Node> map = go.getNodeMap(nodes);
+        List<Edge> path = go.retrievePath(graph, nodes, map);
+        go.printPath(path, map.get(graph.getDestination()), map.get(graph.getOrigin()));
     }
 }

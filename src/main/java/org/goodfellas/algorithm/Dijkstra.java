@@ -114,5 +114,11 @@ public class Dijkstra {
         public int id;
         public Node[] adjacent;
         
+        public String toString() {
+            if(pi == null)
+                return "[(" + id + ")," + distance + "]";
+            else
+                return "[(" + id + ")," + distance + "," + pi.id + "]";
+        }
     }
 }

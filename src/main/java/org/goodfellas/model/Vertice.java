@@ -43,8 +43,10 @@ public class Vertice {
         double value = Utils.euclideanDistance(this.getX(), vertice.getX(), this.getY(), vertice.getY());
 
         Edge edge = new Edge(this, vertice, value);
-
+//        Edge edge2 = new Edge(vertice, this, value);
+        
         edges.add(edge);
+//        vertice.getEdges().add(edge2);
 
         graph.addVertice(vertice);
 
@@ -60,16 +62,7 @@ public class Vertice {
     
     @Override
     public String toString() {
-        String line = "vertex[" + this.getId() + "," + this.getX() + "," + this.getY() + "]";
-        if(this.edges.size() > 0) {
-            line += " -> edges[";
-            for(Edge e : this.edges) {
-                line += e.getVerticeTo().getId() + "(" + e.getValue() + "),";
-            }
-            line = line.substring(0, line.length() - 1 ) + "]";
-        }
-        line += "\n";
-        return line;
+        return "[" + this.getId() + "(" + this.getX() + "," + this.getY() + ")]";
     }
 
     public int getId() {

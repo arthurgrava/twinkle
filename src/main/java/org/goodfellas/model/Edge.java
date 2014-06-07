@@ -13,7 +13,10 @@ public class Edge {
 		this.value = value;
 
 	}
-
+	
+	public String toString() {
+	    return this.verticeFrom.toString() + " - [" + this.value + "] -> " + this.verticeTo.toString();
+	}
 
 	public double getValue() {
 		return this.value;
