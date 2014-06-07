@@ -18,7 +18,8 @@ public class App {
         String fileName = null;
         boolean performanceTest = false;
         if (args.length < 1 || args.length > 2) {
-            System.out.println("To run the program you should give an input.");
+            System.out.println("To run the program you should give an input as follows:");
+            System.out.println("java twinkle.jar [FILE_PATH]");
             System.exit(0);
         } else if (args.length == 1) {
             fileName = args[0];
