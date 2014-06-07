@@ -1,5 +1,7 @@
 package org.goodfellas.controller;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -8,11 +10,22 @@ import org.goodfellas.model.Vertice;
 
 public class GraphLoader {
 
-    final String REGEX = " ";
     private Graph graph;
+    private Scanner sc;
 
-    public Graph loadFromFile() {
-        Scanner sc = new Scanner(System.in);
+    /*
+        If nothing is passed to the constructor, it
+        initializes a scanner from System.in
+     */
+    public GraphLoader() {
+        sc = new Scanner(System.in);
+    }
+
+    public GraphLoader(String pathToFile) throws FileNotFoundException {
+        sc = new Scanner(new File(pathToFile));
+    }
+
+    public Graph load() {
         final int n = sc.nextInt();
         final int m = sc.nextInt();
         
