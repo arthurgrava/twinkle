@@ -70,6 +70,8 @@ public class App {
             System.exit(1);
         }
 
+        System.exit(0);
+
     }
 
 }
