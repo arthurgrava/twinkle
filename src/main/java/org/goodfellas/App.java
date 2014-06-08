@@ -1,6 +1,9 @@
 package org.goodfellas;
 
+import java.awt.*;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -19,8 +22,8 @@ public class App {
         boolean performanceTest = false;
         if (args.length < 1 || args.length > 2) {
             System.out.println("To run the program you should give an input as follows:");
-            System.out.println("java twinkle.jar [FILE_PATH]");
-            System.exit(0);
+            System.out.println("java -jar twinkle.jar [FILE_PATH] or java -jar twinkle.jar [FILE_PATH] [true|false]");
+            System.exit(1);
         } else if (args.length == 1) {
             fileName = args[0];
         } else if (args.length == 2) {
@@ -32,8 +35,8 @@ public class App {
         try {
             gl = new GraphLoader(fileName);
         } catch (FileNotFoundException e) {
-            System.out.println("Could not find the file, please provide a valid file path.");
-            System.exit(0);
+            System.out.println("Could not find the file, please provide a valid input file path.");
+            System.exit(1);
         }
 
         final GraphOperations go = new GraphOperations();
@@ -58,6 +61,14 @@ public class App {
         Map<Integer, Node> map = go.getNodeMap(nodes);
         List<Edge> path = go.retrievePath(graph, nodes, map);
         go.printPath(path, map.get(graph.getDestination()), map.get(graph.getOrigin()));
+
+        try {
+            graph.toHtml(path);
+            Desktop.getDesktop().browse(new File("index.html").toURI());
+        } catch (IOException e) {
+            System.out.println("Could not generate the HTML file, please contact the devs.");
+            System.exit(1);
+        }
 
     }
 

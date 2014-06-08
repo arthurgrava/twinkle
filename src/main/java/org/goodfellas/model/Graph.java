@@ -56,79 +56,48 @@ public class Graph {
 		return line;
 	}
 
-    public String toHtml(List<Edge> caminho) {
-        String html = "";//adicionar o arquivo html, que nao se altera. Poderia nem ser gerado.
-
-        try{
-            createHtmlGraph(caminho);
-        }catch(IOException e){
-            e.printStackTrace();
-        }
-        return null;
+    public void toHtml(List<Edge> path) throws IOException {
+        createHtmlGraph(path);
     }
 
-    /**
-     * Cria o arquivo que e lido pelo html com os vertices e nos do grafo
-     * @throws IOException
-     */
     private void createHtmlGraph(List<Edge> caminho) throws IOException {
-
-        String dir = "D:\\workspace\\twinkle\\src\\main\\java\\org\\goodfellas\\model";
         String fileName = "graph";
         String fileExtension = ".json";
 
-        //File file = new File(dir+File.separator+ fileName + fileExtension);
         File file = new File(fileName+fileExtension);
-
-
-        if (file.exists()) {
-            file.delete();
-        }
-
-        //FileWriter fileWriter = new FileWriter(dir+File.separator + fileName + fileExtension, true);
-        FileWriter fileWriter = new FileWriter(fileName + fileExtension, true);
-
+        FileWriter fileWriter = new FileWriter(fileName + fileExtension, false);
 
         PrintWriter printWriter = new PrintWriter(fileWriter);
         String printedVertices=
-                "{"+"\n"+
+                "var graph = {"+"\n"+
                         "\"nodes\":["+"\n";
         String printedEdges=
                 "],"+"\n"+
                         "\"links\":["+"\n";
 
         boolean [] v_path = new boolean[this.vertices.size()];//armazena se o vertice faz parte do menor caminho
-        //  Map<Integer, boolean[]> e_path = new HashMap<Integer,boolean[]>();//armazena se a aresta faz parte do menor caminho
 
-
-        for(Edge g:caminho){
-
+        for(Edge g : caminho){
             v_path[g.getVerticeFrom().getId()] = true;
             v_path[g.getVerticeTo().getId()] = true;
-
         }
-        /*v_path[this.getOrigin()] = true;
-        v_path[this.getDestination()] = true;*/
 
         /**
-         * @TODO - preencher vetor de booleans
-         */
-        /**
-         * o for realiza ate o penultimo, que recebe virgula.
-         * o ultimo e feito na sequencia
+         * o for inclui ate o penultimo vertice no arquivo, que recebe virgula na estrutura
+         * do .json.
+         * o ultimo e feito na sequencia, sem a virgula
          */
         int i;
         for(i=0; i<this.vertices.size()-1;i++){
-
             Vertice vertice = this.vertices.get(i);
             String grupo;
             if(v_path[i]==true)
                 grupo = "1";
             else
                 grupo = "2";
+
             String vertexLabel = vertice.getId()+",["+vertice.getX()+","+vertice.getY()+"]";
             printedVertices += "{\"name\":\""+vertexLabel+"\",\"group\":"+grupo+"},"+"\n";
-
 
             int j=0;
             List<Edge> edges = vertice.getEdges();
@@ -137,7 +106,7 @@ public class Graph {
                 for(j=0; j<edges.size();j++ ){
                     Edge edge = edges.get(j);
                     String value;
-                    if(caminho.contains(edge))
+                    if(containsEdge(edge, caminho))
                         value = "5";
                     else
                         value = "0.5";
@@ -147,27 +116,20 @@ public class Graph {
 
 
                     //se for a ultima aresta e o proximo vertice existir e nao tiver arestas
-                    /**/if(j==edges.size()-1 && i+2==vertices.size()){
+                    if(j==edges.size()-1 && i+2==vertices.size()) {
                         if(vertices.get(i+1).getEdges()==null || vertices.get(i+1).getEdges().size()==0){
                             printedEdges += "{\"source\":"+source+",\"target\":"+destination+",\"value\":"+value+"}"+"\n";
                         }
-                    }
-                    else{
+                    } else {
                         printedEdges += "{\"source\":"+source+",\"target\":"+destination+",\"value\":"+value+"},"+"\n";
+
                     }
-
-                    //printedEdges += "{\"source\":"+source+",\"target\":"+destination+",\"value\":"+value+"},"+"\n";
-
                 }
             }
 
-
-
         }
 
-        /**
-         * ultimo vertice
-         */
+        // last vertice
         Vertice vertice = this.vertices.get(new Integer(i));
         String grupo;
         if(v_path[i]==true)
@@ -176,9 +138,11 @@ public class Graph {
             grupo = "2";
 
         String vertexLabel = vertice.getId()+",["+vertice.getX()+","+vertice.getY()+"]";
-
         printedVertices += "{\"name\":\""+vertexLabel+"\",\"group\":"+grupo+"}" +"\n";
 
+        /**
+         * arestas do ultimo vertice
+         */
         int j=0;
         List<Edge> edges = vertice.getEdges();
         if(edges!=null && edges.size()>0){
@@ -186,7 +150,7 @@ public class Graph {
             for(j=0; j<edges.size()-1;j++ ){
                 Edge edge = edges.get(j);
                 String value;
-                if(caminho.contains(edge))
+                if(containsEdge(edge, caminho))
                     value = "5";
                 else
                     value = "0.5";
@@ -200,7 +164,7 @@ public class Graph {
             /*ultima aresta*/
             Edge edge = edges.get(j);
             String value;
-            if(caminho.contains(edge))
+            if(containsEdge(edge, caminho))
                 value = "5";
             else
                 value = "0.5";
@@ -211,9 +175,7 @@ public class Graph {
             printedEdges += "{\"source\":"+source+",\"target\":"+destination+",\"value\":"+value+"}" +"\n";
         }
 
-
-        /*fim arquivo*/
-
+        // end of file
         printedEdges +=
                 "]"+"\n"+
                         "}";
@@ -223,7 +185,16 @@ public class Graph {
 
         fileWriter.close();
         printWriter.close();
+    }
 
+    boolean containsEdge(Edge e, List<Edge> path){
+        for(Edge edge : path){
+            if(edge.getVerticeTo().getId() == e.getVerticeTo().getId() &&
+                    edge.getVerticeFrom().getId() == e.getVerticeFrom().getId()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Map<Integer, Vertice> getVertices() {
