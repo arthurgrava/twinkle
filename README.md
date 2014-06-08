@@ -1,25 +1,17 @@
 twinkle
 =======
 
-Projeto criado para a matéria de AED do programa de mestrado do curso de Sistemas de Informção. A especificação do projeto, bem como a tradução total do repositório serão inseridas em breve.
+The project was created for the Analysis of Algorithms and Data Structures course in the Master of Science Graduate Program in Information Systems.
 
 ## Graph
 * Graph contains maps of Vertices and Edges
 * Vertice contains id and coordinates (x and y)
 * Edge contains value and pointers for the Vertice before and after
 
-## Build, compile and run with sbt
-```
-$ sbt
-> package
-> compile
-> run
-```
-or
+## Build the project
 ```
 $ sbt package compile run
 ```
-
 or
 ```
 $ mvn clean install
@@ -27,5 +19,10 @@ $ mvn clean install
 
 ## Running the project
 ```
-$ java -jar twinkle.jar < input/one.txt
+$ java -jar twinkle.jar [PATH_TO_INPUT_FILE] [PERFORMANCE_TEST: true|false]
+```
+examples:
+```
+$ java -jar twinkle.jar input/one.txt
+$ java -jar twinkle.jar input/two.txt true
 ```
