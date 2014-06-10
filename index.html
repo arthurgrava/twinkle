@@ -69,7 +69,7 @@
                   .enter().append("line")
                   .attr("class", "link")
                   .style("stroke", function(d) { return d.value; })
-                  .style("stroke-width", function(d) { if (d.value == 'red') { return '4px' } else { return '1px' } } );
+                  .style("stroke-width", function(d) { if (d.value == 'red') { return '1px' } else { return '1px' } } );
               
                             
               var gnodes = svg.selectAll('g.gnode')
