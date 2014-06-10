@@ -1,7 +1,9 @@
 package org.goodfellas.model;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 
 import org.goodfellas.util.Utils;
 
@@ -10,8 +12,11 @@ public class Vertice {
     private int id;
     private int x;
     private int y;
+    
+    private double distance;
 
     private List<Edge> edges;
+    Map<Integer, Vertice> connections;
 
     public Vertice(int id, int x, int y) {
 
@@ -20,17 +25,7 @@ public class Vertice {
         this.y = y;
 
         this.edges = new ArrayList<Edge>();
-
-    }
-
-    public Vertice(int id, int x, int y, List<Edge> edges) {
-
-        this.id = id;
-        this.x = x;
-        this.y = y;
-
-        this.edges = edges;
-
+        this.connections = new HashMap<Integer, Vertice>();
     }
 
 
@@ -94,6 +89,21 @@ public class Vertice {
 
     public void setEdges(List<Edge> edges) {
         this.edges = edges;
+    }
+
+    public double getDistance() {
+        return distance;
+    }
+
+    public void setDistance(double distance) {
+        this.distance = distance;
+    }
+
+    public void addEdge(Edge edge) {
+        if(!connections.containsKey(edge.getVerticeTo().getId())) {
+            this.edges.add(edge);
+            connections.put(edge.getVerticeTo().getId(), edge.getVerticeTo());
+        }
     }
 
 }

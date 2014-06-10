@@ -1,47 +1,44 @@
 package org.goodfellas.algorithm;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.goodfellas.model.Edge;
 import org.goodfellas.model.Graph;
 import org.goodfellas.model.Vertice;
+import org.goodfellas.util.Utils;
 
 public class Dijkstra {
     
     private Graph graph = null;
     private Node[] queue;
-    private List<Dijkstra.Node> s = null;
+    private Map<Integer, Node> nodes = null;
+    private List<Integer> s = null;
     int ini =  0;
     
     public Dijkstra(final Graph graph) {
         this.graph = graph;
+        nodes = new HashMap<Integer, Node>();
     }
     
     public void execute() {
         initialize();
-        s = new ArrayList<Dijkstra.Node>();
+        s = new ArrayList<Integer>(graph.getNumVertices());
         while(ini < queue.length) {
             Node u = retrieveMinimum();
             ini++;
-            s.add(u.copy());
+            s.add(u.id);
             List<Edge> adj = graph.getVertices().get(u.id).getEdges();
             for(int i = 0 ; i < u.adjacent.length ; i++) {
                 double distUV = adj.get(i).getValue();
-                relax(u, u.adjacent[i], distUV);
+                relax(u, this.nodes.get(u.adjacent[i]), distUV);
             }
         }
     }
     
-    private void getAdjacent(Node u) {
-        Vertice ver = graph.getVertices().get(u.id);
-        List<Edge> e = ver.getEdges();
-        u.adjacent = new Node[e.size()];
-        for(int i = 0 ; i < e.size() ; i++) {
-            u.adjacent[i] = queue[e.get(i).getVerticeTo().getId()];
-        }
-    }
-
     private void buildMinHeapify() {
         int i = (queue.length - ini) / 2;
         while(i >= 0) {
@@ -50,23 +47,26 @@ public class Dijkstra {
         }
     }
     
-    private void minHeapify(int i, int m) {
-        int esq = 2 * i;
-        int dir = (2 * i) + 1;
-        int menor = -1;
-        if(esq < m && queue[esq].distance < queue[i].distance) {
-            menor = esq;
-        } else {
-            menor = i;
+    private void minHeapify(int i, int size) {
+        int left = 2 * i;
+        int right = (2 * i) + 1;
+        int small = i;
+        if(left < size && this.queue[left].distance < this.queue[small].distance) {
+            small = left;
         }
-        if(dir < m && queue[dir].distance < queue[menor].distance) {
-            menor = dir;
+        if(right < size && this.queue[right].distance < this.queue[small].distance) {
+            small = right;
         }
-        if(menor != i) {
-            Node temp = queue[menor];
-            queue[menor] = queue[i];
-            queue[i] = temp;
-            minHeapify(menor, m);
+        if(small != i) {
+            Node temp = new Node(this.queue[small].id, this.queue[small].distance, this.queue[small].pi, this.queue[small].adjacent);
+            this.queue[small] = this.queue[i];
+            this.queue[i] = temp;
+            this.nodes.put(temp.id, temp);
+            minHeapify(small, size);
+//            Node temp = new Node(this.queue[small].id, this.queue[small].distance, this.queue[small].pi);
+//            this.queue[small] = this.queue[i];
+//            this.queue[i] = temp;
+//            minHeapify(small, size);
         }
     }
 
@@ -76,49 +76,70 @@ public class Dijkstra {
     }
 
     private void initialize() {
-        queue = new Node[graph.getNumVertices()];
-        for(int i = 0 ; i < queue.length ; i++) {
-            queue[i] = new Node(i, Double.MAX_VALUE, null);
+        this.queue = new Node[graph.getNumVertices()];
+        
+        Map<Integer, Vertice> vertices = graph.getVertices();
+        Set<Integer> keys = vertices.keySet();
+        
+        for(Integer key : keys) {
+            Vertice v = vertices.get(key);
+            int[] adjacent = getAdjacent(v);
+            Node node = new Node(v.getId(), Double.MAX_VALUE, -1, adjacent);
+            this.queue[key] = node;
+            this.nodes.put(v.getId(), node);
         }
-        queue[graph.getOrigin()].distance = 0.0;
-        for(int i = 0 ; i < queue.length ; i++) {
-            getAdjacent(queue[i]);
-        }
+//        
+//        for(int i = 0 ; i < keys.length ; i++) {
+//            Vertice v = vertices.get(keys[i]);
+//            int[] adjacent = getAdjacent(v);
+//            Node node = new Node(v.getId(), Double.MAX_VALUE, -1, adjacent);
+//            this.queue[keys[i]] = node;
+//            this.nodes.put(v.getId(), node);
+//        }
+        
+        this.queue[graph.getOrigin()].distance = 0.0;
     }
     
+    private int[] getAdjacent(Vertice v) {
+        List<Edge> e = v.getEdges();
+        int adj[] = new int[e.size()];
+        for(int i = 0 ; i < e.size() ; i++) {
+            adj[i] = e.get(i).getVerticeTo().getId();
+        }
+        return adj;
+    }
+
     private void relax(Node u, Node v, Double distUV) {
-        if(v.distance > (u.distance + distUV)) {
+        if(v.distance > (u.distance + distUV) || (v.distance == Double.MAX_VALUE && u.distance == Double.MAX_VALUE)) {
             v.distance = (u.distance + distUV);
-            v.pi = u;
+            v.pi = u.id;
         }
     }
     
     public List<Node> getPath() {
-        return s;
+        List<Node> array = new ArrayList<Node>(s.size());
+        for(Integer i : s) {
+            array.add(this.nodes.get(i));
+        }
+        return array;
     }
     
     public class Node {
         
-        Node(int id, double distance, Node pi) {
+        public int id;
+        public int pi;
+        public double distance;
+        public int[] adjacent;
+        
+        public Node(int id, double distance, int pi, int[] adjacent) {
             this.id = id;
             this.distance = distance;
             this.pi = pi;
+            this.adjacent = Utils.copyArray(adjacent);
         }
         
-        Node copy () {
-            return new Node(this.id, this.distance, this.pi);
-        }
-        
-        public double distance;
-        public Node pi;
-        public int id;
-        public Node[] adjacent;
-        
-        public String toString() {
-            if(pi == null)
-                return "[(" + id + ")," + distance + "]";
-            else
-                return "[(" + id + ")," + distance + "," + pi.id + "]";
+        public Node copy(Node node) {
+            return new Node(node.id, node.distance, node.pi, node.adjacent);
         }
     }
 }

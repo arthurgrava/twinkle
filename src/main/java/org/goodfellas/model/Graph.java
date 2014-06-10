@@ -9,6 +9,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import org.goodfellas.util.Utils;
+
 public class Graph {
 
 	/* Map containing all the vertices, type <vertice id, vertice obj> */
@@ -27,6 +29,22 @@ public class Graph {
 		numVertices = 0;
 
 	}
+	
+	public void connect(Vertice one, Vertice two) {
+	    
+	    if(!vertices.containsKey(one.getId()))
+            vertices.put(one.getId(), one);
+	    
+	    if(!vertices.containsKey(two.getId()))
+            vertices.put(two.getId(), two);
+	    
+	    Edge edge = new Edge(one, two, Utils.euclideanDistance(one.getX(), two.getX(), one.getY(), two.getY()));
+	    one.addEdge(edge);
+	    
+	    edge = new Edge(two, one, Utils.euclideanDistance(one.getX(), two.getX(), one.getY(), two.getY()));
+	    two.addEdge(edge);
+	    
+	}
 
 	public Graph(Map<Integer, Vertice> vertices, int numEdges) {
 
@@ -42,7 +60,6 @@ public class Graph {
 	public void addVertice(Vertice vertice) {
 
 		vertices.put( vertice.getId(), vertice );
-		this.numVertices++;
 		this.numEdges += vertice.getEdges().size();
 
 	}

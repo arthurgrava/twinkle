@@ -2,20 +2,20 @@ package org.goodfellas.model;
 
 public class Edge {
 
-	private Vertice verticeFrom;
-	private Vertice verticeTo;
+	private Vertice from;
+	private Vertice to;
 	private double value;
 
 	public Edge(Vertice verticeFrom, Vertice verticeTo, double value) {
 
-		this.verticeFrom = verticeFrom;
-		this.verticeTo = verticeTo;
+		this.from = verticeFrom;
+		this.to = verticeTo;
 		this.value = value;
 
 	}
 	
 	public String toString() {
-	    return this.verticeFrom.toString() + " - [" + this.value + "] -> " + this.verticeTo.toString();
+	    return this.from.toString() + " - [" + this.value + "] -> " + this.to.toString();
 	}
 
 	public double getValue() {
@@ -27,19 +27,19 @@ public class Edge {
 	}
 
 	public Vertice getVerticeFrom() {
-		return verticeFrom;
+		return from;
 	}
 
 	public void setVerticeFrom(Vertice verticeFrom) {
-		this.verticeFrom = verticeFrom;
+		this.from = verticeFrom;
 	}
 
 	public Vertice getVerticeTo() {
-		return verticeTo;
+		return to;
 	}
 
 	public void setVerticeTo(Vertice verticeTo) {
-		this.verticeTo = verticeTo;
+		this.to = verticeTo;
 	}
 
 }

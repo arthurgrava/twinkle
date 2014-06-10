@@ -1,8 +1,8 @@
 var graph = {
 "nodes":[
 {"name":"0,[1000,2400]","group":1},
-{"name":"1,[2800,3000]","group":2},
-{"name":"2,[2400,2500]","group":2},
+{"name":"1,[2800,3000]","group":1},
+{"name":"2,[2400,2500]","group":1},
 {"name":"3,[4000,0]","group":2},
 {"name":"4,[4500,38005]","group":2},
 {"name":"5,[6000,1500]","group":1}
@@ -11,12 +11,20 @@ var graph = {
 "links":[
 {"source":0,"target":1,"value":5},
 {"source":0,"target":3,"value":0.5},
-{"source":1,"target":2,"value":0.5},
+{"source":1,"target":0,"value":0.5},
+{"source":1,"target":2,"value":5},
 {"source":1,"target":4,"value":0.5},
+{"source":2,"target":1,"value":0.5},
 {"source":2,"target":4,"value":0.5},
 {"source":2,"target":3,"value":0.5},
-{"source":2,"target":5,"value":0.5},
+{"source":2,"target":5,"value":5},
+{"source":3,"target":0,"value":0.5},
+{"source":3,"target":2,"value":0.5},
 {"source":3,"target":5,"value":0.5},
-{"source":4,"target":5,"value":0.5}
+{"source":4,"target":1,"value":0.5},
+{"source":4,"target":2,"value":0.5},
+{"source":5,"target":2,"value":0.5},
+{"source":5,"target":3,"value":0.5},
+{"source":5,"target":4,"value":0.5}
 ]
 }

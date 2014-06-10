@@ -14,4 +14,12 @@ public final class Utils {
 
 	}
 
+    public static int[] copyArray(int[] adjacent) {
+        int[] newArray = new int[adjacent.length];
+        for(int i = 0 ; i < adjacent.length ; i++) {
+            newArray[i] = adjacent[i];
+        }
+        return newArray;
+    }
+
 }

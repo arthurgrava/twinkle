@@ -8,10 +8,35 @@ import java.util.Map;
 import org.goodfellas.algorithm.Dijkstra.Node;
 import org.goodfellas.model.Edge;
 import org.goodfellas.model.Graph;
+import org.goodfellas.model.Vertex;
 import org.goodfellas.model.Vertice;
 
 public class GraphOperations {
-
+    
+    public void print(final List<Integer> path, final int origin, final int destination, final Map<Integer, Vertex> vertices) {
+        String line = "";
+        
+        int prev = -1;
+        int actual = -1;
+        for(int i = path.size() - 2 ; i >= 0 ; i--) {
+            prev = path.get(i + 1);
+            actual = path.get(i);
+            
+            line += prev + " " + actual + "\n";
+        }
+        
+        line += "\n";
+        
+        double dist = vertices.get(destination).getDistance();
+        line += String.format("%.1f\n", dist);
+        
+        if(actual == destination) {
+            System.out.println(line);
+        } else {
+            System.out.println("There is no path between " + origin + " and " + destination);
+        }
+    }
+    
     public void printPath(final List<Edge> path, final Node destination, final Node origin) {
         if(!path.isEmpty()) {
             if(path.get(path.size() - 1).getVerticeFrom().getId() != origin.id) {
@@ -38,11 +63,11 @@ public class GraphOperations {
         
         while(dest != origin) {
             Node node = map.get(dest);
-            if(node.pi == null) {
+            if(node.pi == -1) {
                 dest = origin;
             } else { 
-                path.add(new Edge(vertices.get(node.pi.id), vertices.get(dest), 1));
-                dest = node.pi.id;
+                path.add(new Edge(vertices.get(node.pi), vertices.get(dest), 1));
+                dest = node.pi;
             }
         }
         
