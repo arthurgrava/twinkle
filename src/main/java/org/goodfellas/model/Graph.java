@@ -49,11 +49,15 @@ public class Graph {
         for(Integer key : vertices.keySet()) {
             aux = vertices.get(key);
             isPath = path.contains(aux.getId());
-            double x = aux.getX() / maxX * 512.0;
-            double y = aux.getY() / maxY * 400.0;
+            double x = aux.getX() / maxX * 960.0;
+            double y = aux.getY() / maxY * 500.0;
             
             // {"name":"0,[6371,1811]","group":2,x:652,y:342,fixed:true}
-            nodes += "{\"name\":\"" + aux.getId() + "\", \"group\":2, \"x\":" + x + ",\"y\":" + y + ", \"fixed\":true},";
+            if(isPath) {
+                nodes += "{\"name\":\"" + aux.getId() + "\", \"group\":9, \"x\":" + y + ",\"y\":" + x + ", \"fixed\":true},";
+            } else {
+                nodes += "{\"name\":\"" + aux.getId() + "\", \"group\":8, \"x\":" + y + ",\"y\":" + x + ", \"fixed\":true},";
+            }
             // {"source":30891,"target":30898,"value":"gray"},
             for(Integer adj : aux.getAdjacent()) {
                 conn = vertices.get(adj);
