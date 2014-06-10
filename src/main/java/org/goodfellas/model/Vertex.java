@@ -59,6 +59,15 @@ public class Vertex {
     public List<Integer> getAdjacent() {
         return adjacent;
     }
+    
+    public void removeAdjacent(int id) {
+        for(int i = 0 ; i < adjacent.size() ; i++) {
+            if(adjacent.get(i) == id) {
+                adjacent.remove(i);
+                return;
+            }
+        }
+    }
 
     public void setAdjacent(List<Integer> adjacent) {
         this.adjacent = adjacent;

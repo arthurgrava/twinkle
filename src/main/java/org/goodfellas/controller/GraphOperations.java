@@ -22,7 +22,7 @@ public class GraphOperations {
         line += "\n";
         
         double dist = vertices.get(destination).getDistance();
-        line += String.format("%.1f\n", dist);
+        line += String.format("%.1f", dist);
         
         if(actual == destination) {
             System.out.println(line);

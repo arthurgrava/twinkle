@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import org.goodfellas.algorithm.Dijkstra;
 import org.goodfellas.controller.GraphLoader;
@@ -13,7 +12,7 @@ import org.goodfellas.controller.GraphOperations;
 import org.goodfellas.model.Graph;
 
 public class App {
-    
+
     public static void main( String[] args ) {
         String fileName = null;
         boolean performanceTest = false;
@@ -46,28 +45,36 @@ public class App {
 
         Dijkstra alg =  new Dijkstra(graph);
         alg.execute();
-        go.print(alg.getPath(), graph.getOrigin(), graph.getDestination(), graph.getVertices());
-        
+        List<Integer> path = alg.getPath();
+        go.print(path, graph.getOrigin(), graph.getDestination(), graph.getVertices());
+
         if (performanceTest) {
-          endTime = System.currentTimeMillis();
-          System.out.println("Took [" + (endTime - startTime) + "] ms to run Dijkstra algorithm in a Graph with ["
-                  + graph.getNumVertices() + "] vertices and [" + graph.getNumEdges() + "] edges.");
-          System.exit(0);
-      }
+            endTime = System.currentTimeMillis();
+            System.out.println("Took [" + (endTime - startTime) + "] ms to run Dijkstra algorithm in a Graph with ["
+                    + graph.getNumVertices() + "] vertices and [" + graph.getNumEdges() + "] edges.");
+            System.exit(0);
+        }
+        
+        try {
+            graph.toHtml(path);
+            Desktop.getDesktop().browse(new File("index.html").toURI());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        //      Map<Integer, Node> map = go.getNodeMap(nodes);
+        //      List<Edge> path = go.retrievePath(graph, nodes, map);
+        //      go.printPath(path, map.get(graph.getDestination()), map.get(graph.getOrigin()));
+        //
+        //      try {
+        //          graph.toHtml(path);
+        //          Desktop.getDesktop().browse(new File("index.html").toURI());
+        //      } catch (IOException e) {
+        //          System.out.println("Could not generate the HTML file, please contact the devs.");
+        //          System.exit(1);
+        //      }
 
-//      Map<Integer, Node> map = go.getNodeMap(nodes);
-//      List<Edge> path = go.retrievePath(graph, nodes, map);
-//      go.printPath(path, map.get(graph.getDestination()), map.get(graph.getOrigin()));
-//
-//      try {
-//          graph.toHtml(path);
-//          Desktop.getDesktop().browse(new File("index.html").toURI());
-//      } catch (IOException e) {
-//          System.out.println("Could not generate the HTML file, please contact the devs.");
-//          System.exit(1);
-//      }
-
-      System.exit(0);
+        System.exit(0);
 
     }
 

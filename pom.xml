@@ -18,7 +18,7 @@
     </dependencies>
 
     <build>
-        <finalName>twinkle</finalName>
+        <finalName>twinkle-1.0</finalName>
         <pluginManagement>
             <plugins>
                 <plugin>

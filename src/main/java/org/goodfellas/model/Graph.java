@@ -1,5 +1,6 @@
 package org.goodfellas.model;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -30,23 +31,47 @@ public class Graph {
     }
     
     public void toHtml(List<Integer> path) throws IOException {
-        String fileName = "graph";
-        String fileExtensions = ".json";
+        String fileName = "graph.json";
         
-        File file = new File(fileName + fileExtensions);
-        FileWriter fw = new FileWriter(file, false);
-        PrintWriter pw = new PrintWriter(fw);
+        String nodes = "";
+        String edges = "";
         
-        String printedVertices=
-                "var graph = {"+"\n"+
-                        "\"nodes\":["+"\n";
-        String printedEdges=
-                "],"+"\n"+
-                        "\"links\":["+"\n";
+        double maxX = 0.0;
+        double maxY = 0.0;
+        for(Integer key : vertices.keySet()) {
+            maxX = (maxX > vertices.get(key).getX()) ? maxX : vertices.get(key).getX();
+            maxY = (maxY > vertices.get(key).getY()) ? maxY : vertices.get(key).getY();
+        }
         
-        boolean [] vPath = new boolean[this.vertices.size()];
+        Vertex aux = null;
+        Vertex conn = null;
+        boolean isPath = false;
+        for(Integer key : vertices.keySet()) {
+            aux = vertices.get(key);
+            isPath = path.contains(aux.getId());
+            double x = aux.getX() / maxX * 512.0;
+            double y = aux.getY() / maxY * 400.0;
+            
+            // {"name":"0,[6371,1811]","group":2,x:652,y:342,fixed:true}
+            nodes += "{\"name\":\"" + aux.getId() + "\", \"group\":2, \"x\":" + x + ",\"y\":" + y + ", \"fixed\":true},";
+            // {"source":30891,"target":30898,"value":"gray"},
+            for(Integer adj : aux.getAdjacent()) {
+                conn = vertices.get(adj);
+                if(isPath && path.contains(conn.getId())) {
+                    edges +=  "{\"source\":" + aux.getId() + ",\"target\":" + conn.getId() + ",\"value\":\"red\"},";
+                } else {
+                    edges += "{\"source\":" + aux.getId() + ",\"target\":" + conn.getId() + ",\"value\":\"gray\"},";
+                }
+                conn.removeAdjacent(aux.getId());
+            }
+        }
+        nodes = nodes.substring(0, nodes.length() - 1);
+        edges = edges.substring(0, edges.length() - 1);
         
-        
+        BufferedWriter bw = new BufferedWriter(new FileWriter(new File(fileName), false));
+        bw.write("var graph = { \"nodes\":[" + nodes + "], \"links\":[" + edges + "]}");
+        bw.flush();
+        bw.close();
     }
     
     public void addVertex(int id, int x, int y) {
