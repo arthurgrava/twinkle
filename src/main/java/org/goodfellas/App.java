@@ -7,13 +7,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import org.goodfellas.algorithm.Algorithm;
 import org.goodfellas.algorithm.Dijkstra;
-import org.goodfellas.algorithm.Dijkstra.Node;
 import org.goodfellas.controller.GraphLoader;
 import org.goodfellas.controller.GraphOperations;
-import org.goodfellas.model.Edge;
-import org.goodfellas.model.Grafo;
 import org.goodfellas.model.Graph;
 
 public class App {
@@ -41,14 +37,14 @@ public class App {
         }
 
         final GraphOperations go = new GraphOperations();
-        Grafo graph = gl.loadTwo();
+        Graph graph = gl.load();
 
         long startTime = 0l;
         long endTime = 0l;
         if (performanceTest)
             startTime = System.currentTimeMillis();
 
-        Algorithm alg =  new Algorithm(graph);
+        Dijkstra alg =  new Dijkstra(graph);
         alg.execute();
         go.print(alg.getPath(), graph.getOrigin(), graph.getDestination(), graph.getVertices());
         
