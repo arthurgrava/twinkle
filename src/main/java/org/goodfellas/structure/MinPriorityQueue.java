@@ -1,4 +1,4 @@
-package org.goodfellas.controller;
+package org.goodfellas.structure;
 
 import org.goodfellas.structure.Graph;
 import org.goodfellas.structure.Vertex;
@@ -22,6 +22,14 @@ public class MinPriorityQueue {
         }
 
         swap(source.getId(), 0);
+    }
+
+    public boolean isEmpty() {
+        return heapSize == 0;
+    }
+
+    public int getSize() {
+        return heapSize;
     }
 
     public void minHeapify(int i) {

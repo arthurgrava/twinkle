@@ -1,6 +1,7 @@
 package org.goodfellas.controller;
 
 import java.util.List;
+import java.util.Stack;
 
 import org.goodfellas.structure.Edge;
 
@@ -14,6 +15,6 @@ public interface ShortestPath {
     
     public void execute();
     
-    public List<Edge> shortestPath();
+    public Stack<Edge> shortestPath();
     
 }
