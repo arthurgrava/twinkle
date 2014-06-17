@@ -7,13 +7,13 @@ import org.goodfellas.util.Constants;
 public class MinPriorityQueue {
 
     private Vertex[] heap;
-    private int size = 0;
+    private int heapSize = 0;
 
 
     public MinPriorityQueue(Graph graph, Vertex source) {
 
         heap = new Vertex[graph.getNumVertices()];
-        size = graph.getNumVertices();
+        heapSize = graph.getNumVertices();
 
         for (Vertex v : graph.getVertices().values()) {
             v.addSlot(Constants.PI, null);
@@ -22,6 +22,47 @@ public class MinPriorityQueue {
         }
 
         swap(source.getId(), 0);
+    }
+
+    public void minHeapify(int i) {
+        int l = left(i);
+        int r = right(i);
+        int minIndex = -1;
+
+        if (l < heapSize && distance(heap[l]) < distance(heap[i]))
+            minIndex = l;
+        else
+            minIndex = i;
+
+        if (r < heapSize && distance(heap[r]) < distance(heap[minIndex]))
+            minIndex = r;
+
+        if (minIndex != i) {
+            swap(i, minIndex);
+            minHeapify(minIndex);
+        }
+    }
+
+    private int left(int i) {
+        return 2*i;
+    }
+
+    private int right(int i) {
+        return 2*i + 1;
+    }
+
+    public Vertex extractMin() {
+        Vertex min = min();
+        swap(0, heapSize - 1);
+        heapSize--;
+
+        minHeapify(0);
+
+        return min;
+    }
+
+    public Vertex min() {
+        return heap[0];
     }
 
     public void decreaseKey(Vertex v, Double distance) {
