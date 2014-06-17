@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.goodfellas.util.Constants;
+
 public class Graph {
     
     private Map<Integer, Vertex> vertices = null;
@@ -60,8 +62,8 @@ public class Graph {
         }
         graph += "\n";
         
-        graph += "option: " + this.getProperty("option", Integer.class) + "\n";
-        List<Integer[]> list = this.getProperty("pathsToFind", List.class);
+        graph += "option: " + this.getProperty(Constants.OPTION, Integer.class) + "\n";
+        List<Integer[]> list = this.getProperty(Constants.PATHS, List.class);
         for(Integer[] integer : list) {
             graph += "path: " + integer[0] + " -> " + integer[1] + "\n";
         }
