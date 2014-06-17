@@ -1,27 +1,28 @@
 package org.goodfellas.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+/**
+ * Class representing a node of the graph
+ */
 public class Vertex {
     
     private int id;
     private int x;
     private int y;
-    private int pi = -1;
-    private double distance;
-    private List<Integer> adjacent;
+    
+    private Map<String, Object> slots;
+    private List<Edge> adjacent;
     
     public Vertex(int id, int x, int y) {
         this.id = id;
         this.x = x;
         this.y = y;
-        this.distance = Double.MAX_VALUE;
-        this.adjacent = new ArrayList<Integer>();
-    }
-    
-    public void addAdjacent(Vertex vertex) {
-        adjacent.add(vertex.getId());
+        this.slots = new HashMap<>();
+        this.adjacent = new ArrayList<>();
     }
 
     public int getId() {
@@ -48,40 +49,30 @@ public class Vertex {
         this.y = y;
     }
 
-    public double getDistance() {
-        return distance;
+    public Map<String, Object> getSlots() {
+        return slots;
     }
-
-    public void setDistance(double distance) {
-        this.distance = distance;
+    
+    public void addSlot(String key, Object value) {
+        this.slots.put(key, value);
     }
-
-    public List<Integer> getAdjacent() {
+    
+    public <T> T getSlot(String key, Class<T> clazz) {
+        return clazz.cast(this.slots.get(key));
+    }
+    
+    protected Edge addAdjacent(Vertex to) {
+        Edge edge = new Edge(this, to);
+        this.adjacent.add(edge);
+        return edge;
+    }
+    
+    public List<Edge> getAdjacent() {
         return adjacent;
     }
     
-    public void removeAdjacent(int id) {
-        for(int i = 0 ; i < adjacent.size() ; i++) {
-            if(adjacent.get(i) == id) {
-                adjacent.remove(i);
-                return;
-            }
-        }
-    }
-
-    public void setAdjacent(List<Integer> adjacent) {
-        this.adjacent = adjacent;
-    }
-
-    public int getPi() {
-        return pi;
-    }
-
-    public void setPi(int pi) {
-        this.pi = pi;
-    }
-    
+    @Override
     public String toString() {
-        return this.id + "(" + this.distance + ")";
+        return this.getId() + " (" + this.getX() + ", " + this.getY() + ")";
     }
 }
