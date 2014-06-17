@@ -2,7 +2,7 @@ organization := "org.goodfellas"
 
 name := "twinkle"
 
-version := "1.0"
+version := "2.0"
 
 autoScalaLibrary := false
 
