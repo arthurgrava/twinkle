@@ -52,4 +52,21 @@ public class Graph {
         return clazz.cast(this.properties.get(key));
     }
     
+    @Override
+    public String toString() {
+        String graph = this.vertices.toString() + "\n\n";
+        for(Edge edge : this.edges) {
+            graph += edge.toString() + "\n";
+        }
+        graph += "\n";
+        
+        graph += "option: " + this.getProperty("option", Integer.class) + "\n";
+        List<Integer[]> list = this.getProperty("pathsToFind", List.class);
+        for(Integer[] integer : list) {
+            graph += "path: " + integer[0] + " -> " + integer[1] + "\n";
+        }
+        
+        return graph;
+    }
+    
 }
