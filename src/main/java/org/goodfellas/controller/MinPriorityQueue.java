@@ -1,7 +1,7 @@
 package org.goodfellas.controller;
 
-import org.goodfellas.model.Graph;
-import org.goodfellas.model.Vertex;
+import org.goodfellas.structure.Graph;
+import org.goodfellas.structure.Vertex;
 import org.goodfellas.util.Constants;
 
 public class MinPriorityQueue {

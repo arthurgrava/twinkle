@@ -1,4 +1,4 @@
-package org.goodfellas.model;
+package org.goodfellas.structure;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +31,10 @@ public class Graph {
     
     public void addVertex(Vertex vertex) {
         this.vertices.put(vertex.getId(), vertex);
+    }
+    
+    public Vertex getVertex(Integer key) {
+        return this.vertices.get(key);
     }
     
     public Map<Integer, Vertex> getVertices() {

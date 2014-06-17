@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-import org.goodfellas.model.Graph;
-import org.goodfellas.model.Vertex;
+import org.goodfellas.structure.Graph;
+import org.goodfellas.structure.Vertex;
 import org.goodfellas.util.Constants;
 
 public class GraphLoader {

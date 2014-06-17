@@ -1,4 +1,4 @@
-package org.goodfellas.model;
+package org.goodfellas.structure;
 
 import org.goodfellas.util.Utils;
 
