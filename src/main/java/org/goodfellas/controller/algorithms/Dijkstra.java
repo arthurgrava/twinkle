@@ -12,9 +12,13 @@ public class Dijkstra implements ShortestPath {
     
     private Graph graph = null;
     private MinPriorityQueue queue = null;
+    private Vertex source = null;
+    private Vertex destination;
     
-    public Dijkstra(Graph graph, Vertex source) {
+    public Dijkstra(Graph graph, Vertex source, Vertex destination) {
         this.graph = graph;
+        this.source = source;
+        this.destination = destination;
         queue = new MinPriorityQueue(graph, source);
     }
     
