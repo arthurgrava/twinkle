@@ -40,7 +40,7 @@ public class Graph {
         this.edges.add(to.addAdjacent(from));
     }
     
-    public void addProperty(String key, String value) {
+    public void addProperty(String key, Object value) {
         this.properties.put(key, value);
     }
     
