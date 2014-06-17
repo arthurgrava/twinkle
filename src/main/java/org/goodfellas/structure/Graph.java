@@ -16,9 +16,9 @@ public class Graph {
     // TODO - setting initial capacity is good for do not allocate more memory than needed
     
     public Graph(int numVertices, int numEdges) {
-        vertices = new HashMap<>(numVertices);
-        edges = new ArrayList<>(numEdges * 2); // (* 2) bidirectional
-        properties = new HashMap<>();
+        vertices = new HashMap<Integer, Vertex>(numVertices);
+        edges = new ArrayList<Edge>(numEdges * 2); // (* 2) bidirectional
+        properties = new HashMap<String, Object>();
     }
     
     public int getNumVertices() {

@@ -21,8 +21,8 @@ public class Vertex {
         this.id = id;
         this.x = x;
         this.y = y;
-        this.slots = new HashMap<>();
-        this.adjacent = new ArrayList<>();
+        this.slots = new HashMap<String, Object>();
+        this.adjacent = new ArrayList<Edge>();
     }
 
     public int getId() {
