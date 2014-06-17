@@ -66,7 +66,7 @@ public class GraphLoader {
             
             // TODO - I'm not ok with this solution
             
-            graph.addProperty("pathsToFins", paths);
+            graph.addProperty("pathsToFind", paths);
             
             return graph;
         } finally {
