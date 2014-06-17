@@ -3,7 +3,7 @@ package org.goodfellas;
 import java.io.FileNotFoundException;
 
 import org.goodfellas.model.Graph;
-import org.goodfellas.operations.GraphLoader;
+import org.goodfellas.controller.GraphLoader;
 
 public class App {
 
