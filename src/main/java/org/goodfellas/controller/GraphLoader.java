@@ -7,8 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-import org.goodfellas.model.Graph;
-import org.goodfellas.model.Vertex;
+import org.goodfellas.structure.Graph;
+import org.goodfellas.structure.Vertex;
+import org.goodfellas.util.Constants;
 
 public class GraphLoader {
 
@@ -52,7 +53,7 @@ public class GraphLoader {
             }
 
             int option = sc.nextInt();
-            graph.addProperty("option", option);
+            graph.addProperty(Constants.OPTION, option);
 
             int pathsToFind = sc.nextInt();
             List<Integer[]> paths = new ArrayList<>(pathsToFind);
@@ -66,7 +67,7 @@ public class GraphLoader {
             
             // TODO - I'm not ok with this solution
             
-            graph.addProperty("pathsToFind", paths);
+            graph.addProperty(Constants.PATHS, paths);
             
             return graph;
         } finally {

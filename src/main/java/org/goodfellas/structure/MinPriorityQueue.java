@@ -1,7 +1,7 @@
-package org.goodfellas.controller;
+package org.goodfellas.structure;
 
-import org.goodfellas.model.Graph;
-import org.goodfellas.model.Vertex;
+import org.goodfellas.structure.Graph;
+import org.goodfellas.structure.Vertex;
 import org.goodfellas.util.Constants;
 
 import java.util.HashMap;
@@ -31,31 +31,12 @@ public class MinPriorityQueue {
         swap(source.getId(), 0);
     }
 
-    private void minHeapify(int i) {
-        int l = left(i);
-        int r = right(i);
-        int minIndex = -1;
-
-        if (l < heapSize && distance(heap[l]) < distance(heap[i]))
-            minIndex = l;
-        else
-            minIndex = i;
-
-        if (r < heapSize && distance(heap[r]) < distance(heap[minIndex]))
-            minIndex = r;
-
-        if (minIndex != i) {
-            swap(i, minIndex);
-            minHeapify(minIndex);
-        }
+    public boolean isEmpty() {
+        return heapSize == 0;
     }
 
-    private int left(int i) {
-        return 2*i;
-    }
-
-    private int right(int i) {
-        return 2*i + 1;
+    public int getSize() {
+        return heapSize;
     }
 
     public Vertex extractMin() {
@@ -84,6 +65,33 @@ public class MinPriorityQueue {
             parentIndex = getParent(actualIndex);
         }
 
+    }
+
+    private void minHeapify(int i) {
+        int l = left(i);
+        int r = right(i);
+        int minIndex = -1;
+
+        if (l < heapSize && distance(heap[l]) < distance(heap[i]))
+            minIndex = l;
+        else
+            minIndex = i;
+
+        if (r < heapSize && distance(heap[r]) < distance(heap[minIndex]))
+            minIndex = r;
+
+        if (minIndex != i) {
+            swap(i, minIndex);
+            minHeapify(minIndex);
+        }
+    }
+
+    private int left(int i) {
+        return 2*i;
+    }
+
+    private int right(int i) {
+        return 2*i + 1;
     }
 
     private int getParent(int i) {

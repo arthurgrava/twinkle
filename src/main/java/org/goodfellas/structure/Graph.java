@@ -1,9 +1,11 @@
-package org.goodfellas.model;
+package org.goodfellas.structure;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.goodfellas.util.Constants;
 
 public class Graph {
     
@@ -14,9 +16,9 @@ public class Graph {
     // TODO - setting initial capacity is good for do not allocate more memory than needed
     
     public Graph(int numVertices, int numEdges) {
-        vertices = new HashMap<>(numVertices);
-        edges = new ArrayList<>(numEdges * 2); // (* 2) bidirectional
-        properties = new HashMap<>();
+        vertices = new HashMap<Integer, Vertex>(numVertices);
+        edges = new ArrayList<Edge>(numEdges * 2); // (* 2) bidirectional
+        properties = new HashMap<String, Object>();
     }
     
     public int getNumVertices() {
@@ -29,6 +31,10 @@ public class Graph {
     
     public void addVertex(Vertex vertex) {
         this.vertices.put(vertex.getId(), vertex);
+    }
+    
+    public Vertex getVertex(Integer key) {
+        return this.vertices.get(key);
     }
     
     public Map<Integer, Vertex> getVertices() {
@@ -60,8 +66,8 @@ public class Graph {
         }
         graph += "\n";
         
-        graph += "option: " + this.getProperty("option", Integer.class) + "\n";
-        List<Integer[]> list = this.getProperty("pathsToFind", List.class);
+        graph += "option: " + this.getProperty(Constants.OPTION, Integer.class) + "\n";
+        List<Integer[]> list = this.getProperty(Constants.PATHS, List.class);
         for(Integer[] integer : list) {
             graph += "path: " + integer[0] + " -> " + integer[1] + "\n";
         }
