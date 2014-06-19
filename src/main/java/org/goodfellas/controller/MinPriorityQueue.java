@@ -4,27 +4,34 @@ import org.goodfellas.model.Graph;
 import org.goodfellas.model.Vertex;
 import org.goodfellas.util.Constants;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MinPriorityQueue {
 
     private Vertex[] heap;
     private int heapSize = 0;
-
+    // this map was created to suppress the problem of swap,
+    // when using the heap index to index vertexes.
+    private Map<Integer, Integer> vertexHeapMap;
 
     public MinPriorityQueue(Graph graph, Vertex source) {
 
         heap = new Vertex[graph.getNumVertices()];
         heapSize = graph.getNumVertices();
+        vertexHeapMap = new HashMap<Integer, Integer>(graph.getNumVertices());
 
         for (Vertex v : graph.getVertices().values()) {
             v.addSlot(Constants.PI, null);
             v.addSlot(Constants.DISTANCE, Double.MAX_VALUE);
             heap[v.getId()] = v;
+            vertexHeapMap.put(v.getId(), v.getId());
         }
 
         swap(source.getId(), 0);
     }
 
-    public void minHeapify(int i) {
+    private void minHeapify(int i) {
         int l = left(i);
         int r = right(i);
         int minIndex = -1;
@@ -69,8 +76,8 @@ public class MinPriorityQueue {
 
         v.addSlot(Constants.DISTANCE, distance);
 
-        int actualIndex = v.getId();
-        int parentIndex = getParent(v.getId());
+        int actualIndex = vertexHeapMap.get(v.getId());
+        int parentIndex = getParent( vertexHeapMap.get(v.getId()) );
         while (actualIndex > 0 && distance(heap[actualIndex]) < distance(heap[parentIndex])) {
             swap(actualIndex, parentIndex);
             actualIndex = parentIndex;
@@ -91,6 +98,9 @@ public class MinPriorityQueue {
         Vertex aux = heap[i];
         heap[i] = heap[j];
         heap[j] = aux;
+
+        vertexHeapMap.put(heap[i].getId(), j);
+        vertexHeapMap.put(heap[j].getId(), i);
     }
 
 }
