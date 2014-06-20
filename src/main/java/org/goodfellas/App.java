@@ -41,15 +41,14 @@ public class App {
                 long start = System.currentTimeMillis();
                 
                 shortest.execute();
-                path = shortest.shortestPath();
                 
                 long end = System.currentTimeMillis() - start;
+                
+                path = shortest.shortestPath();
                 
                 graphPrinter.printPath(path, graph.getVertex(combination[0]), graph.getVertex(combination[1]), end);
                 graphPrinter.toJson(path, graph);
             }
-
-            System.out.println("Implementation soon");
         } catch (FileNotFoundException e) {
             System.err.println("File not found");
         }

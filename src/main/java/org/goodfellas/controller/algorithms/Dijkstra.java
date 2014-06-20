@@ -45,10 +45,13 @@ public class Dijkstra implements ShortestPath {
 
             Edge antToActual = null;
             for (Edge e : actual.getAdjacent()) {
-                if (e.getFrom().getId() == ant.getId())
+                if (e.getTo().getId() == ant.getId()) {
                     antToActual = e;
+                    break;
+                }
             }
             stack.push(antToActual);
+            actual = ant;
         }
 
         return stack;

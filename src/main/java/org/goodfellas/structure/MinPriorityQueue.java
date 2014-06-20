@@ -27,6 +27,8 @@ public class MinPriorityQueue {
             heap[v.getId()] = v;
             vertexHeapMap.put(v.getId(), v.getId());
         }
+        
+        source.addSlot(Constants.DISTANCE, 0.0);
 
         swap(source.getId(), 0);
     }
