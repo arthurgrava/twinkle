@@ -1,7 +1,5 @@
 package org.goodfellas.controller.algorithms;
 
-import java.util.Deque;
-import java.util.List;
 import java.util.Stack;
 
 import org.goodfellas.structure.MinPriorityQueue;

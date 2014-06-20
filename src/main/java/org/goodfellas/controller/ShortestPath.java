@@ -1,6 +1,5 @@
 package org.goodfellas.controller;
 
-import java.util.List;
 import java.util.Stack;
 
 import org.goodfellas.structure.Edge;
