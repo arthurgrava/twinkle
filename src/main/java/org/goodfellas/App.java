@@ -32,13 +32,19 @@ public class App {
 
             ShortestPath shortest = null;
             List<Integer[]> paths = graph.getProperty(Constants.PATHS, List.class);
-            Stack<Edge> path = new Stack<Edge>();
+            Stack<Edge> path = null;
+            
             for(Integer[] combination : paths) {
                 shortest = new Dijkstra(graph, graph.getVertex(combination[0]), graph.getVertex(combination[1]));
-                //shortest.execute();
-                //path = shortest.shortestPath();
-                path.add(new Edge(graph.getVertex(0), graph.getVertex(1)));
-                graphPrinter.printPath(new Stack<Edge>(), graph.getVertex(combination[0]));
+                
+                long start = System.currentTimeMillis();
+                
+                shortest.execute();
+                path = shortest.shortestPath();
+                
+                long end = System.currentTimeMillis() - start;
+                
+                graphPrinter.printPath(path, graph.getVertex(combination[0]), graph.getVertex(combination[1]), end);
                 graphPrinter.toJson(path, graph);
             }
 

@@ -59,13 +59,16 @@ public class GraphPrinter {
         bw.close();
     }
     
-    public void printPath(Stack<Edge> path, Vertex destination) {
+    public void printPath(Stack<Edge> path, Vertex destination, Vertex origin, long timeToRun) {
         Edge edge = null;
+        System.out.println("===========================");
+        System.out.println(origin.getId() + " " + destination.getId() + "\n");
         for(int i = path.size() - 1 ; i >= 0 ; i--) {
             edge = path.get(i);
             System.out.println(edge.getFrom().getId() + " " + edge.getTo().getId());
         }
-        System.out.println(destination.getSlot(Constants.PI, Double.class));
+        System.out.println("\n" + destination.getSlot(Constants.PI, Double.class));
+        System.out.println(timeToRun);
     }
     
 }
