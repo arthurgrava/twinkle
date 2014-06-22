@@ -68,7 +68,7 @@ public class GraphPrinter {
             bw.append("{\"from\":{\"x\": " + fromX + ", \"y\": " + (-(fromY - 500)) + "},\"to\":{ \"x\": " + toX + ", \"y\": " + (-(toY - 500)) + "}},");
         }
 
-        bw.write("],\"colors\":{\"edges\": \"gray\", \"path\": \"red\"}}");
+        bw.write("],\"colors\":{\"edges\": \"rgba(20, 7, 71, 0.7)\", \"path\": \"rgba(216, 43, 34, 0.4)\", \"vertices\": \"rgba(20, 7, 71, 0.7)\"}}");
         bw.flush();
         bw.close();
     }
