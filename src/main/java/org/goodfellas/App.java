@@ -1,5 +1,7 @@
 package org.goodfellas;
 
+import java.awt.Desktop;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
@@ -52,6 +54,12 @@ public class App {
                 
                 graphPrinter.printPath(path, graph.getVertex(combination[0]), graph.getVertex(combination[1]), end);
                 graphPrinter.toJson(path, graph);
+            }
+            
+            try {
+                Desktop.getDesktop().browse(new File("index.html").toURI());
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         } catch (FileNotFoundException e) {
             System.err.println("File not found");

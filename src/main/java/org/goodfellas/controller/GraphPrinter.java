@@ -14,51 +14,65 @@ import org.goodfellas.structure.Vertex;
 import org.goodfellas.util.Constants;
 
 public class GraphPrinter {
-    
+
     public void toJson(Stack<Edge> path, Graph graph) throws IOException {
         final String fileName = "graph.json";
-        
-        String nodes = "";
-        String edges = "";
-        
+
         double maxX = 0.0;
         double maxY = 0.0;
         Map<Integer, Vertex> map = graph.getVertices();
         Set<Integer> keys = map.keySet();
-        
+
         for(Integer key : keys) {
             maxX = (maxX > map.get(key).getX()) ? maxX : map.get(key).getX();
             maxY = (maxY > map.get(key).getY()) ? maxY : map.get(key).getY();
         }
+
+        BufferedWriter bw = new BufferedWriter(new FileWriter(new File(fileName), false));
         
-        Vertex current = null;
-        Vertex adjacent = null;
+        Vertex from = null;
+        Vertex to = null;
+        double fromX = -1.0;
+        double fromY = -1.0;
+        double toX = -1.0;
+        double toY = -1.0;
+
+        bw.append("var graph = { \"edges\":[");
+
         for(Integer key : keys) {
-            current = map.get(key);
-            double x = current.getX() / maxX * 960.0;
-            double y = current.getY() / maxY * 500.0;
-            
-            nodes += "{\"name\":\"" + current.getId() + "\", \"group\":1, \"x\":" + x + ",\"y\":" + (-(y - 500)) + ", \"fixed\":true},";
+            from = map.get(key);
+            fromX = from.getX() / maxX * 960.0;
+            fromY = from.getY() / maxY * 500.0;
+
             // just to remember from = current and to = adjacent
-            for(Edge edge : current.getAdjacent()) {
-                adjacent = edge.getTo();
-                edges += "{\"source\":" + current.getId() + ",\"target\":" + adjacent.getId() + ",\"value\":\"gray\"},";
+            // {"from":{"x": 0, "y": 3},"to":{ "x": 0, "y": 150.0}}
+            for(Edge edge : from.getAdjacent()) {
+                to = edge.getTo();
+                toX = to.getX() / maxX * 960.0;
+                toY = to.getY() / maxY * 500.0;
+                bw.append("{\"from\":{\"x\": " + fromX + ", \"y\": " + (-(fromY - 500)) + "},\"to\":{ \"x\": " + toX + ", \"y\": " + (-(toY - 500)) + "}},");
             }
         }
         
+        bw.append("],\"path\":[");
+        
         for(Edge edge : path) {
-            edges += "{\"source\":" + edge.getFrom().getId() + ",\"target\":" + edge.getTo().getId() + ",\"value\":\"red\"},";
+            from = edge.getFrom();
+            to = edge.getTo();
+            
+            fromX = from.getX() / maxX * 960.0;
+            fromY = from.getY() / maxY * 500.0;
+            toX = to.getX() / maxX * 960.0;
+            toY = to.getY() / maxY * 500.0;
+            
+            bw.append("{\"from\":{\"x\": " + fromX + ", \"y\": " + (-(fromY - 500)) + "},\"to\":{ \"x\": " + toX + ", \"y\": " + (-(toY - 500)) + "}},");
         }
-        
-        nodes = nodes.substring(0, nodes.length() - 1);
-        edges = edges.substring(0, edges.length() - 1);
-        
-        BufferedWriter bw = new BufferedWriter(new FileWriter(new File(fileName), false));
-        bw.write("var graph = { \"nodes\":[" + nodes + "], \"links\":[" + edges + "]}");
+
+        bw.write("],\"colors\":{\"edges\": \"rgba(20, 7, 71, 0.7)\", \"path\": \"rgba(216, 43, 34, 0.4)\", \"vertices\": \"rgba(20, 7, 71, 0.7)\"}}");
         bw.flush();
         bw.close();
     }
-    
+
     public void printPath(Stack<Edge> path, Vertex origin, Vertex destination, long timeToRun) {
         Edge edge = null;
         System.out.println("===========================");
@@ -70,5 +84,5 @@ public class GraphPrinter {
         System.out.println(String.format("\n%.1f", destination.getSlot(Constants.DISTANCE, Double.class)));
         System.out.println(timeToRun);
     }
-    
+
 }
