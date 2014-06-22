@@ -50,7 +50,7 @@ public class GraphPrinter {
                 to = edge.getTo();
                 toX = to.getX() / maxX * 960.0;
                 toY = to.getY() / maxY * 500.0;
-                bw.append("{\"from\":{\"x\": " + fromX + ", \"y\": " + (-(fromY - 500)) + "},\"to\":{ \"x\": " + toX + ", \"y\": " + (-(toY - 500)) + "}},");
+                bw.append("{\"from\":{\"x\": " + fromX + ", \"y\": " + (-(fromY - 510)) + "},\"to\":{ \"x\": " + toX + ", \"y\": " + (-(toY - 510)) + "}},");
             }
         }
         
@@ -65,7 +65,7 @@ public class GraphPrinter {
             toX = to.getX() / maxX * 960.0;
             toY = to.getY() / maxY * 500.0;
             
-            bw.append("{\"from\":{\"x\": " + fromX + ", \"y\": " + (-(fromY - 500)) + "},\"to\":{ \"x\": " + toX + ", \"y\": " + (-(toY - 500)) + "}},");
+            bw.append("{\"from\":{\"x\": " + fromX + ", \"y\": " + (-(fromY - 510)) + "},\"to\":{ \"x\": " + toX + ", \"y\": " + (-(toY - 510)) + "}},");
         }
 
         bw.write("],\"colors\":{\"edges\": \"rgba(20, 7, 71, 0.7)\", \"path\": \"rgba(216, 43, 34, 0.4)\", \"vertices\": \"rgba(20, 7, 71, 0.7)\"}}");
