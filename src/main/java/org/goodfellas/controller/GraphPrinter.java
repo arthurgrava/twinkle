@@ -32,28 +32,28 @@ public class GraphPrinter {
         bw.append("var graph = { \"nodes\":[");
         
         Vertex current = null;
-        Vertex adjacent = null;
         for(Integer key : keys) {
             current = map.get(key);
             double x = current.getX() / maxX * 960.0;
             double y = current.getY() / maxY * 500.0;
             
-            bw.append("{\"name\":\"" + current.getId() + "\", \"group\":1, \"x\":" + x + ",\"y\":" + (-(y - 500)) + ", \"fixed\":true},");
+            bw.append("{\"id\":\"" + current.getId() + "\", \"x\":" + x + ",\"y\":" + (-(y - 500)) + "},");
         }
         
         bw.append("], \"links\":[");
         
+        Vertex adjacent = null;
         for(Integer key : keys) {
             current = map.get(key);
             // just to remember from = current and to = adjacent
             for(Edge edge : current.getAdjacent()) {
                 adjacent = edge.getTo();
-                bw.append("{\"source\":" + current.getId() + ",\"target\":" + adjacent.getId() + ",\"value\":\"gray\"},");
+                bw.append("{\"from\":" + current.getId() + ",\"to\":" + adjacent.getId() + ",\"color\":\"gray\"},");
             }
         }
         
         for(Edge edge : path) {
-            bw.append("{\"source\":" + edge.getFrom().getId() + ",\"target\":" + edge.getTo().getId() + ",\"value\":\"red\"},");
+            bw.append("{\"from\":" + edge.getFrom().getId() + ",\"to\":" + edge.getTo().getId() + ",\"color\":\"red\"},");
         }
         
         bw.write("]}");
