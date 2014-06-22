@@ -18,9 +18,6 @@ public class GraphPrinter {
     public void toJson(Stack<Edge> path, Graph graph) throws IOException {
         final String fileName = "graph.json";
         
-        String nodes = "";
-        String edges = "";
-        
         double maxX = 0.0;
         double maxY = 0.0;
         Map<Integer, Vertex> map = graph.getVertices();
@@ -31,6 +28,9 @@ public class GraphPrinter {
             maxY = (maxY > map.get(key).getY()) ? maxY : map.get(key).getY();
         }
         
+        BufferedWriter bw = new BufferedWriter(new FileWriter(new File(fileName), false));
+        bw.append("var graph = { \"nodes\":[");
+        
         Vertex current = null;
         Vertex adjacent = null;
         for(Integer key : keys) {
@@ -38,23 +38,25 @@ public class GraphPrinter {
             double x = current.getX() / maxX * 960.0;
             double y = current.getY() / maxY * 500.0;
             
-            nodes += "{\"name\":\"" + current.getId() + "\", \"group\":1, \"x\":" + x + ",\"y\":" + (-(y - 500)) + ", \"fixed\":true},";
+            bw.append("{\"name\":\"" + current.getId() + "\", \"group\":1, \"x\":" + x + ",\"y\":" + (-(y - 500)) + ", \"fixed\":true},");
+        }
+        
+        bw.append("], \"links\":[");
+        
+        for(Integer key : keys) {
+            current = map.get(key);
             // just to remember from = current and to = adjacent
             for(Edge edge : current.getAdjacent()) {
                 adjacent = edge.getTo();
-                edges += "{\"source\":" + current.getId() + ",\"target\":" + adjacent.getId() + ",\"value\":\"gray\"},";
+                bw.append("{\"source\":" + current.getId() + ",\"target\":" + adjacent.getId() + ",\"value\":\"gray\"},");
             }
         }
         
         for(Edge edge : path) {
-            edges += "{\"source\":" + edge.getFrom().getId() + ",\"target\":" + edge.getTo().getId() + ",\"value\":\"red\"},";
+            bw.append("{\"source\":" + edge.getFrom().getId() + ",\"target\":" + edge.getTo().getId() + ",\"value\":\"red\"},");
         }
         
-        nodes = nodes.substring(0, nodes.length() - 1);
-        edges = edges.substring(0, edges.length() - 1);
-        
-        BufferedWriter bw = new BufferedWriter(new FileWriter(new File(fileName), false));
-        bw.write("var graph = { \"nodes\":[" + nodes + "], \"links\":[" + edges + "]}");
+        bw.write("]}");
         bw.flush();
         bw.close();
     }
