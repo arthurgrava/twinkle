@@ -55,13 +55,13 @@ public class MinPriorityQueue {
         return heap[0];
     }
 
-    public void decreaseKey(Vertex v, Double distance) {
+    public void decreaseKey(Vertex v, double distance) {
 
         v.addSlot(Constants.DISTANCE, distance);
 
         int actualIndex = vertexHeapMap.get(v.getId());
         int parentIndex = getParent( vertexHeapMap.get(v.getId()) );
-        while (actualIndex > 0 && distance(heap[actualIndex]) < distance(heap[parentIndex])) {
+        while (actualIndex > 0 && distance(heap[parentIndex]) > distance(heap[actualIndex])) {
             swap(actualIndex, parentIndex);
             actualIndex = parentIndex;
             parentIndex = getParent(actualIndex);
@@ -74,12 +74,12 @@ public class MinPriorityQueue {
         int r = right(i);
         int minIndex = -1;
 
-        if (l < heapSize && distance(heap[l]) < distance(heap[i]))
+        if (l < heapSize - 1 && distance(heap[l]) < distance(heap[i]))
             minIndex = l;
         else
             minIndex = i;
 
-        if (r < heapSize && distance(heap[r]) < distance(heap[minIndex]))
+        if (r < heapSize - 1 && distance(heap[r]) < distance(heap[minIndex]))
             minIndex = r;
 
         if (minIndex != i) {
@@ -89,15 +89,15 @@ public class MinPriorityQueue {
     }
 
     private int left(int i) {
-        return 2*i;
-    }
-
-    private int right(int i) {
         return 2*i + 1;
     }
 
+    private int right(int i) {
+        return 2*i + 2;
+    }
+
     private int getParent(int i) {
-        return (int) Math.floor( ((double) i ) / 2.0 );
+        return (int) Math.floor( ((double) (i - 1) ) / 2.0 );
     }
 
     private Double distance(Vertex v) {
@@ -109,8 +109,8 @@ public class MinPriorityQueue {
         heap[i] = heap[j];
         heap[j] = aux;
 
-        vertexHeapMap.put(heap[i].getId(), j);
-        vertexHeapMap.put(heap[j].getId(), i);
+        vertexHeapMap.put(heap[i].getId(), i);
+        vertexHeapMap.put(heap[j].getId(), j);
     }
 
 }
