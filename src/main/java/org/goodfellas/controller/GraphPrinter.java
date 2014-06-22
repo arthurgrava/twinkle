@@ -38,7 +38,7 @@ public class GraphPrinter {
             double x = current.getX() / maxX * 960.0;
             double y = current.getY() / maxY * 500.0;
             
-            nodes += "{\"name\":\"" + current.getId() + "\", \"group\":1, \"x\":" + y + ",\"y\":" + x + ", \"fixed\":true},";
+            nodes += "{\"name\":\"" + current.getId() + "\", \"group\":1, \"x\":" + x + ",\"y\":" + (-(y - 500)) + ", \"fixed\":true},";
             // just to remember from = current and to = adjacent
             for(Edge edge : current.getAdjacent()) {
                 adjacent = edge.getTo();

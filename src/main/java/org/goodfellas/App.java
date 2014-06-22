@@ -36,7 +36,11 @@ public class App {
             Stack<Edge> path = null;
             
             for(Integer[] combination : paths) {
-                shortest = getAlgorithm(graph.getProperty(Constants.OPTION, Integer.class), graph, graph.getVertex(combination[0]), graph.getVertex(combination[1]));
+                shortest = getAlgorithm(
+                        graph.getProperty(Constants.OPTION, Integer.class),
+                        graph,
+                        graph.getVertex(combination[0]),
+                        graph.getVertex(combination[1]));
                 
                 long start = System.currentTimeMillis();
                 
