@@ -44,17 +44,20 @@
           context.closePath();
 
           //drawing paths
-          context.beginPath();
-          for (var i = 0; i < graph.path.length; i++) {
-            var pointFrom = graph.path[i].from
-            var pointTo = graph.path[i].to
-            context.moveTo(pointFrom.x, pointFrom.y);
-            context.lineTo(pointTo.x, pointTo.y);
+          for(var i = 0 ; i < graph.paths.length ; i++) {
+              context.beginPath();
+              var path =  graph.paths[i].path;
+              for (var j = 0; j < path.length; j++) {
+                  var pointFrom = path[j].from
+                  var pointTo = path[j].to
+                  context.moveTo(pointFrom.x, pointFrom.y);
+                  context.lineTo(pointTo.x, pointTo.y);
+              }
+              context.strokeStyle = graph.colors.paths[i].color;
+              context.lineWidth = 4;
+              context.stroke();
+              context.closePath();
           }
-          context.strokeStyle = graph.colors.path;
-          context.lineWidth = 4;
-          context.stroke();
-          context.closePath();
 
         </script>
 

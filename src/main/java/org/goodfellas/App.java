@@ -4,6 +4,7 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
@@ -15,6 +16,7 @@ import org.goodfellas.controller.GraphLoader;
 import org.goodfellas.controller.GraphPrinter;
 import org.goodfellas.controller.ShortestPath;
 import org.goodfellas.controller.algorithms.Dijkstra;
+import org.goodfellas.controller.algorithms.EuclidianNetworkDijkstra;
 
 public class App {
 
@@ -35,11 +37,15 @@ public class App {
 
             ShortestPath shortest = null;
             List<Integer[]> paths = graph.getProperty(Constants.PATHS, List.class);
+            
+            int option = graph.getProperty(Constants.OPTION, Integer.class);
+            
+            List<Stack<Edge>> allPaths = new ArrayList<>(paths.size());
             Stack<Edge> path = null;
             
             for(Integer[] combination : paths) {
                 shortest = getAlgorithm(
-                        graph.getProperty(Constants.OPTION, Integer.class),
+                        option,
                         graph,
                         graph.getVertex(combination[0]),
                         graph.getVertex(combination[1]));
@@ -51,24 +57,30 @@ public class App {
                 long end = System.currentTimeMillis() - start;
                 
                 path = shortest.shortestPath();
+                allPaths.add(path);
                 
                 graphPrinter.printPath(path, graph.getVertex(combination[0]), graph.getVertex(combination[1]), end);
-                graphPrinter.toJson(path, graph);
             }
             
-            try {
-                Desktop.getDesktop().browse(new File("index.html").toURI());
-            } catch (IOException e) {
-                e.printStackTrace();
+            if(option == 2) {
+                graphPrinter.toJson(allPaths, graph);
+                try {
+                    Desktop.getDesktop().browse(new File("index.html").toURI());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         } catch (FileNotFoundException e) {
             System.err.println("File not found");
         }
     }
 
-    private static ShortestPath getAlgorithm(Integer option, Graph graph, Vertex source, Vertex destination) {
-        // TODO - change it and create a switch to pick an algorithm
-        return new Dijkstra(graph, source, destination);
+    private static ShortestPath getAlgorithm(int option, Graph graph, Vertex source, Vertex destination) {
+        if(option == 3) {
+            return new EuclidianNetworkDijkstra(graph, source, destination);
+        } else {
+            return new Dijkstra(graph, source, destination);
+        }
     }
 
 }

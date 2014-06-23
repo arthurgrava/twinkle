@@ -4,6 +4,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -15,7 +17,19 @@ import org.goodfellas.util.Constants;
 
 public class GraphPrinter {
 
-    public void toJson(Stack<Edge> path, Graph graph) throws IOException {
+    public static List<String> rgbas = new ArrayList<>(7);
+    
+    static {
+        rgbas.add("rgba(216, 43, 34, 0.6)");
+        rgbas.add("rgba(58, 255, 28, 0.6)");
+        rgbas.add("rgba(255, 182, 0, 0.6)");
+        rgbas.add("rgba(38, 23, 255, 0.6)");
+        rgbas.add("rgba(243, 111, 74, 0.6)");
+        rgbas.add("rgba(255, 10, 247, 0.6)");
+        rgbas.add("rgba(5, 255, 247, 0.6)");
+    }
+    
+    public void toJson(List<Stack<Edge>> paths, Graph graph) throws IOException {
         final String fileName = "graph.json";
 
         double maxX = 0.0;
@@ -54,21 +68,28 @@ public class GraphPrinter {
             }
         }
         
-        bw.append("],\"path\":[");
-        
-        for(Edge edge : path) {
-            from = edge.getFrom();
-            to = edge.getTo();
-            
-            fromX = from.getX() / maxX * 960.0;
-            fromY = from.getY() / maxY * 500.0;
-            toX = to.getX() / maxX * 960.0;
-            toY = to.getY() / maxY * 500.0;
-            
-            bw.append("{\"from\":{\"x\": " + fromX + ", \"y\": " + (-(fromY - 510)) + "},\"to\":{ \"x\": " + toX + ", \"y\": " + (-(toY - 510)) + "}},");
+        bw.append("],\"paths\":[");
+        for(Stack<Edge> path : paths) {
+            bw.append("{\"path\":[");
+            for(Edge edge : path) {
+                from = edge.getFrom();
+                to = edge.getTo();
+                
+                fromX = from.getX() / maxX * 960.0;
+                fromY = from.getY() / maxY * 500.0;
+                toX = to.getX() / maxX * 960.0;
+                toY = to.getY() / maxY * 500.0;
+                
+                bw.append("{\"from\":{\"x\": " + fromX + ", \"y\": " + (-(fromY - 510)) + "},\"to\":{ \"x\": " + toX + ", \"y\": " + (-(toY - 510)) + "}},");
+            }
+            bw.append("],},");
         }
-
-        bw.write("],\"colors\":{\"edges\": \"rgba(20, 7, 71, 0.7)\", \"path\": \"rgba(216, 43, 34, 0.4)\", \"vertices\": \"rgba(20, 7, 71, 0.7)\"}}");
+        
+        bw.write("],\"colors\":{\"edges\": \"rgba(20, 7, 71, 0.7)\", \"vertices\": \"rgba(20, 7, 71, 0.7)\", \"paths\":[");
+        for(int i = 0 ; i < paths.size() ; i++) {
+            bw.append("{\"color\":\"" + rgbas.get(i % rgbas.size()) + "\"},");
+        }
+        bw.append("]}}");
         bw.flush();
         bw.close();
     }

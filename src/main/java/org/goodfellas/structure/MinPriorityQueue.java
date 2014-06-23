@@ -57,8 +57,6 @@ public class MinPriorityQueue {
 
     public void decreaseKey(Vertex v, double distance) {
 
-        v.addSlot(Constants.DISTANCE, distance);
-
         int actualIndex = vertexHeapMap.get(v.getId());
         int parentIndex = getParent( vertexHeapMap.get(v.getId()) );
         while (actualIndex > 0 && distance(heap[parentIndex]) > distance(heap[actualIndex])) {
