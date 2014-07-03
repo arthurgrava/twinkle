@@ -94,10 +94,69 @@ public class FibonacciMinPriorityQueue {
         return h.min;
     }
 
-    public void decreaseKey(Vertex v, double distance) {
+    public void decreaseKey(Vertex x, double distance) {
+        if (distance > distance(x))
+            throw new IllegalArgumentException("Distance can't be greater than the actual distance in v.");
 
-        // TODO
+        x.addSlot(Constants.DISTANCE, distance);
+        Vertex y = parent(x);
+        if (y != null && distance(x) < distance(y)) {
+            cut(x, y);
+            cascadingCut(y);
+        }
+        if (distance(x) < distance(h.min))
+            h.min = x;
+    }
 
+    private void cut(Vertex x, Vertex y) {
+        removeChild(x);
+        insert(x);
+        x.addSlot(Constants.PARENT, null);
+        x.addSlot(Constants.MARK, false);
+    }
+
+    private void cascadingCut(Vertex y) {
+        Vertex z = parent(y);
+        if (z != null) {
+            if (!marked(y))
+                y.addSlot(Constants.MARK, true);
+            else {
+                cut(y, z);
+                cascadingCut(z);
+            }
+        }
+    }
+
+    private void removeChild(Vertex x) {
+        Vertex y = parent(x);
+        y.addSlot(Constants.CHILD, null);
+
+        y.addSlot(Constants.DEGREE, Math.min(0, degree(y)-1));
+
+        // fix parent pointer to child
+        Vertex p = right(x);
+        while (p.getId() != x.getId()) {
+            y.addSlot(Constants.CHILD, p);
+            break;
+        }
+
+        // fix linked list pointers
+        Vertex l = left(x);
+        Vertex r = right(x);
+        r.addSlot(Constants.LEFT, l);
+        l.addSlot(Constants.RIGHT, r);
+
+        x.addSlot(Constants.LEFT, null);
+        x.addSlot(Constants.RIGHT, null);
+        x.addSlot(Constants.PARENT, null);
+    }
+
+    private int degree(Vertex v) {
+        return v.getSlot(Constants.DEGREE, Integer.class);
+    }
+
+    private boolean marked(Vertex v) {
+        return v.getSlot(Constants.MARK, Boolean.class);
     }
 
     private Vertex child(Vertex v) {
