@@ -30,8 +30,6 @@ public class FibonacciMinPriorityQueue {
             if(v.getId() != source.getId())
                 insert(v);
         }
-
-        swap(source.getId(), 0);
     }
 
     public void insert(Vertex vertex) {
@@ -111,7 +109,40 @@ public class FibonacciMinPriorityQueue {
     }
 
     private void consolidate() {
+        int dn = calculateD(h.n); // TODO - calculate
+        Vertex[] array = new Vertex[dn];
+        for(int i = 0 ; i < array.length ; i++) {
+            array[i] = null;
+        }
 
+        Vertex right = h.root;
+        do {
+            int degree = degree(right);
+            while(array[degree] != null) {
+                Vertex y = array[degree];
+                if(distance(right) > distance(y)) {
+                    swap(right, y);
+                }
+                heapLink(right, y);
+                degree = degree + 1;
+            }
+            array[degree] = right;
+            right = right(h.root);
+        } while(right.getId() != h.root.getId());
+        h.min = null;
+        h.root = null;
+        for(int i = 0 ; i < array.length ; i++) {
+            if(array[i] != null) {
+                insert(array[i]);
+            }
+        }
+    }
+
+    private void heapLink(Vertex x, Vertex y) {
+        removeFromRoot(y);
+        x.addSlot(Constants.CHILD, y);
+        x.addSlot(Constants.DEGREE, degree(x) + 1);
+        y.addSlot(Constants.MARK, false);
     }
 
     public boolean isEmpty() {
@@ -148,12 +179,26 @@ public class FibonacciMinPriorityQueue {
         return v.getSlot(Constants.LEFT, Vertex.class);
     }
 
+    private int degree(Vertex v) {
+        if(v.getSlot(Constants.DEGREE, Integer.class) == null) {
+            return 0;
+        } else {
+            return v.getSlot(Constants.DEGREE, Integer.class);
+        }
+    }
+
+    private int calculateD(int n) {
+        return (int) Math.log(n);
+    }
+
     private Double distance(Vertex v) {
         return v.getSlot(Constants.ESTIMATIVE, Double.class);
     }
 
-    private void swap(int i, int j) {
-        // TODO
+    private void swap(Vertex x, Vertex y) {
+        Vertex temp = y;
+        y = x;
+        x = temp;
     }
 
     class FibonacciProperties {
