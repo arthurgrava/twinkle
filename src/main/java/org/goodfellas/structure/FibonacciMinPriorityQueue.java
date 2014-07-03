@@ -43,7 +43,7 @@ public class FibonacciMinPriorityQueue {
         if(this.h.min == null) {
             h.min = vertex;
         } else {
-            if(vertex.getSlot(Constants.ESTIMATIVE, Double.class) < h.min.getSlot(Constants.ESTIMATIVE, Double.class)) {
+            if(distance(vertex) < distance(h.min)) {
                 h.min = vertex;
             }
         }
@@ -58,7 +58,7 @@ public class FibonacciMinPriorityQueue {
             h.root.addSlot(Constants.RIGHT, vertex);
             h.root.addSlot(Constants.LEFT, vertex);
         } else {
-            Vertex temp = h.root.getSlot(Constants.RIGHT, Vertex.class);
+            Vertex temp = right(h.root);
 
             h.root.addSlot(Constants.RIGHT, vertex);
             vertex.addSlot(Constants.RIGHT, temp);
@@ -74,11 +74,18 @@ public class FibonacciMinPriorityQueue {
     }
 
     public int getSize() {
-        return heapSize;
+        return h.n;
     }
 
     public Vertex extractMin() {
-        // TODO
+        if(h.min == null)
+            return null;
+
+        Vertex min = h.min;
+        Vertex child = child(min);
+        while(child != null) {
+//            if()
+        }
 
         return null;
     }
@@ -91,6 +98,22 @@ public class FibonacciMinPriorityQueue {
 
         // TODO
 
+    }
+
+    private Vertex child(Vertex v) {
+        return v.getSlot(Constants.CHILD, Vertex.class);
+    }
+
+    private Vertex parent(Vertex v) {
+        return v.getSlot(Constants.PARENT, Vertex.class);
+    }
+
+    private Vertex right(Vertex v) {
+        return v.getSlot(Constants.RIGHT, Vertex.class);
+    }
+
+    private Vertex left(Vertex v) {
+        return v.getSlot(Constants.LEFT, Vertex.class);
     }
 
     private Double distance(Vertex v) {
