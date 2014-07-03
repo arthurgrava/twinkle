@@ -18,10 +18,6 @@ public class FibonacciMinPriorityQueue {
         vertexHeapMap = new HashMap<Integer, Integer>(graph.getNumVertices());
         h = new FibonacciProperties();
 
-        source.addSlot(Constants.ESTIMATIVE, Utils.euclidianDistance(source, destination));
-        source.addSlot(Constants.DISTANCE, 0.0);
-        insert(source);
-
         for (Vertex v : graph.getVertices().values()) {
             v.addSlot(Constants.PI, null);
             v.addSlot(Constants.DISTANCE, Double.MAX_VALUE);
@@ -30,6 +26,10 @@ public class FibonacciMinPriorityQueue {
             if(v.getId() != source.getId())
                 insert(v);
         }
+
+        source.addSlot(Constants.ESTIMATIVE, Utils.euclidianDistance(source, destination));
+        source.addSlot(Constants.DISTANCE, 0.0);
+        insert(source);
     }
 
     public void insert(Vertex vertex) {
@@ -64,6 +64,7 @@ public class FibonacciMinPriorityQueue {
             } else {
                 removeFromRoot(temp);
                 putOnRoot(temp);
+                child = null;
             }
             temp.addSlot(Constants.PARENT, null);
         }
@@ -106,10 +107,14 @@ public class FibonacciMinPriorityQueue {
 
         v.addSlot(Constants.LEFT, null);
         v.addSlot(Constants.RIGHT, null);
+
+        if(h.root.getId() == v.getId()) {
+            h.root = temp;
+        }
     }
 
     private void consolidate() {
-        int dn = calculateD(h.n); // TODO - calculate
+        int dn = calculateD(h.n) + 1;
         Vertex[] array = new Vertex[dn];
         for(int i = 0 ; i < array.length ; i++) {
             array[i] = null;
@@ -118,21 +123,28 @@ public class FibonacciMinPriorityQueue {
         Vertex right = h.root;
         do {
             int degree = degree(right);
-            while(array[degree] != null) {
+            while(degree < array.length && degree > -1 && array[degree] != null) {
                 Vertex y = array[degree];
                 if(distance(right) > distance(y)) {
                     swap(right, y);
                 }
                 heapLink(right, y);
+                array[degree] = null;
                 degree = degree + 1;
             }
+            if(degree == array.length) {
+                degree--;
+            } else if (degree == -1) {
+                degree = 0;
+            }
             array[degree] = right;
-            right = right(h.root);
+            right = right(right);
         } while(right.getId() != h.root.getId());
         h.min = null;
         h.root = null;
         for(int i = 0 ; i < array.length ; i++) {
             if(array[i] != null) {
+                h.n--;
                 insert(array[i]);
             }
         }
@@ -140,8 +152,23 @@ public class FibonacciMinPriorityQueue {
 
     private void heapLink(Vertex x, Vertex y) {
         removeFromRoot(y);
-        x.addSlot(Constants.CHILD, y);
+
+        if(child(x) != null) {
+            Vertex child = child(x);
+            Vertex temp = right(child);
+
+            child.addSlot(Constants.RIGHT, y);
+            y.addSlot(Constants.RIGHT, temp);
+
+            temp.addSlot(Constants.LEFT, y);
+            y.addSlot(Constants.LEFT, child);
+        } else {
+            x.addSlot(Constants.CHILD, y);
+            y.addSlot(Constants.RIGHT, y);
+            y.addSlot(Constants.LEFT, y);
+        }
         x.addSlot(Constants.DEGREE, degree(x) + 1);
+        y.addSlot(Constants.PARENT, x);
         y.addSlot(Constants.MARK, false);
     }
 
@@ -161,7 +188,7 @@ public class FibonacciMinPriorityQueue {
         if (distance > distance(x))
             throw new IllegalArgumentException("Distance can't be greater than the actual distance in v.");
 
-        x.addSlot(Constants.DISTANCE, distance);
+        x.addSlot(Constants.ESTIMATIVE, distance);
         Vertex y = parent(x);
         if (y != null && distance(x) < distance(y)) {
             cut(x, y);
@@ -174,6 +201,7 @@ public class FibonacciMinPriorityQueue {
     private void cut(Vertex x, Vertex y) {
         removeChild(x);
         insert(x);
+        h.n--;
         x.addSlot(Constants.PARENT, null);
         x.addSlot(Constants.MARK, false);
     }
