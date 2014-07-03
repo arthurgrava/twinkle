@@ -9,7 +9,7 @@ public class FibonacciMinPriorityQueue {
 
     private Vertex min = null;
     private int size = -1;
-    private final double constant = (1.0 + Math.sqrt(5)) / 2.0;
+    private final double phi = (1.0 + Math.sqrt(5)) / 2.0;
 
     public FibonacciMinPriorityQueue(Graph graph, Vertex source, Vertex destination) {
         size = 0;
@@ -50,6 +50,10 @@ public class FibonacciMinPriorityQueue {
 
     private void disconnect(Vertex v) {
         //1 <--> 0 <--> 5 => 1 <--> 5 ... 0
+        if(v == null) {
+            System.out.println("null");
+            return;
+        }
         left(v).addSlot(Constants.RIGHT, right(v));
         right(v).addSlot(Constants.LEFT, left(v));
     }
@@ -61,10 +65,15 @@ public class FibonacciMinPriorityQueue {
     }
 
     public Vertex extractMin() {
-        Vertex minimun = this.min;
-        if(minimun != null) {
-            int children = degree(minimun);
-            Vertex child = child(minimun);
+        Vertex minimum = this.min;
+
+        if(minimum == null) {
+            System.out.print("a");
+        }
+
+        if(minimum != null) {
+            int children = degree(minimum);
+            Vertex child = child(minimum);
             Vertex temp;
             while(children > 0) {
                 temp = right(child);
@@ -75,19 +84,19 @@ public class FibonacciMinPriorityQueue {
                 children--;
             }
         }
-        // removes minimun from root
-        disconnect(minimun);
+        // removes minimum from root
+        disconnect(minimum);
 
-        if(right(minimun).getId() == minimun.getId()) {
+        if(minimum == null || right(minimum).getId() == minimum.getId()) {
             this.min = null;
         } else {
-            this.min = right(minimun);
+            this.min = right(minimum);
             consolidate();
         }
 
         size--;
 
-        return minimun;
+        return minimum;
     }
 
     public void decreaseKey(Vertex x, double distance) {
@@ -100,6 +109,9 @@ public class FibonacciMinPriorityQueue {
             cut(x, y);
             cascadingCut(y);
         }
+        if(this.min == null || distance(x) == null || distance(this.min) == null) {
+            System.out.println();
+        }
         if (distance(x) < distance(this.min))
             this.min = x;
     }
@@ -111,10 +123,8 @@ public class FibonacciMinPriorityQueue {
         y.addSlot(Constants.DEGREE, Math.min(0, degree(y)-1));
 
         // fix parent pointer to child
-        Vertex p = right(x);
-        while (p.getId() != x.getId()) {
-            y.addSlot(Constants.CHILD, p);
-            break;
+        if (right(x).getId() != x.getId()) {
+            y.addSlot(Constants.CHILD, right(x));
         }
 
         // fix linked list pointers
@@ -130,12 +140,11 @@ public class FibonacciMinPriorityQueue {
 
     private void cut(Vertex x, Vertex y) {
 //        removeChild(x);
-        disconnect(x);
-        y.addSlot(Constants.DEGREE, degree(y) - 1);
-
-        if(child(y).getId() == x.getId()) {
+        if (right(x).getId() != x.getId()) {
             y.addSlot(Constants.CHILD, right(x));
         }
+        disconnect(x);
+        y.addSlot(Constants.DEGREE, Math.min(0, degree(y)-1));
 
         if(degree(y) == 0) {
             y.addSlot(Constants.CHILD, null);
@@ -180,6 +189,9 @@ public class FibonacciMinPriorityQueue {
 
         while(roots > 0) {
             int degree = degree(root);
+            if(degree <= -1) {
+                degree = 0;
+            }
             Vertex y = array.get(degree);
 
             while(y != null) {
@@ -189,11 +201,11 @@ public class FibonacciMinPriorityQueue {
                 heapLink(root, y);
                 array.set(degree, null);
                 degree++;
-                if(degree < arraySize) {
-                    y = array.get(degree);
-                } else {
-                    y = null;
-                }
+//                if(degree < arraySize) {
+                y = array.get(degree);
+//                } else {
+//                    y = null;
+//                }
             }
             array.set(degree, root);
             root = right(root);
@@ -206,6 +218,15 @@ public class FibonacciMinPriorityQueue {
             if(y != null) {
                 if(this.min != null) {
                     disconnect(y);
+//                    Vertex parent = parent(y);
+//                    if(parent != null && child(parent).getId() == y.getId()) {
+//                        if(right(y) != null && right(y).getId() != y.getId()) {
+//                            parent.addSlot(Constants.CHILD, right(y));
+//                        } else {
+//                            parent.addSlot(Constants.CHILD, null);
+//                        }
+//                    }
+                    y.addSlot(Constants.PARENT, null);
                     addToRoot(y);
                     if(distance(y) < distance(this.min)) {
                         this.min = y;
@@ -214,6 +235,9 @@ public class FibonacciMinPriorityQueue {
                     this.min = y;
                 }
             }
+        }
+        if(this.min == null) {
+            System.out.println();
         }
     }
 
@@ -238,8 +262,9 @@ public class FibonacciMinPriorityQueue {
         x = temp;
     }
 
+    // page 523 Cormen - 3rd edition (chapter 19.4 - Bounding the maximum degree)
     private int calculateD() {
-        return ((int) (Math.log(size) / Math.log(this.constant))) + 1;
+        return ((int) (Math.log(size) / Math.log(this.phi))) + 1;
     }
 
     private boolean marked(Vertex v) {
