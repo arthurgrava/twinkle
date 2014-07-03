@@ -1,28 +1,23 @@
 package org.goodfellas.structure;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.goodfellas.util.Constants;
 import org.goodfellas.util.Utils;
 
+import java.util.ArrayList;
+
 public class FibonacciMinPriorityQueue {
-    
-    private FibonacciProperties h;
-    // this map was created to suppress the problem of swap,
-    // when using the heap index to index vertexes.
-    private Map<Integer, Integer> vertexHeapMap;
+
+    private Vertex min = null;
+    private int size = -1;
+    private final double constant = (1.0 + Math.sqrt(5)) / 2.0;
 
     public FibonacciMinPriorityQueue(Graph graph, Vertex source, Vertex destination) {
-
-        vertexHeapMap = new HashMap<Integer, Integer>(graph.getNumVertices());
-        h = new FibonacciProperties();
+        size = 0;
 
         for (Vertex v : graph.getVertices().values()) {
             v.addSlot(Constants.PI, null);
             v.addSlot(Constants.DISTANCE, Double.MAX_VALUE);
             v.addSlot(Constants.ESTIMATIVE, Double.MAX_VALUE);
-            vertexHeapMap.put(v.getId(), v.getId());
             if(v.getId() != source.getId())
                 insert(v);
         }
@@ -32,156 +27,67 @@ public class FibonacciMinPriorityQueue {
         insert(source);
     }
 
-    public void insert(Vertex vertex) {
-        vertex.addSlot(Constants.DEGREE, 0);
-        vertex.addSlot(Constants.MARK, false);
-
-        if(this.h.min == null) {
-            h.min = vertex;
-        } else {
-            if(distance(vertex) < distance(h.min)) {
-                h.min = vertex;
+    public void insert(Vertex v) {
+        if(min != null) {
+            connect(min, v);
+            if(distance(min) > distance(v)) {
+                min = v;
             }
+        } else {
+            min = v;
+            min.addSlot(Constants.RIGHT, min);
+            min.addSlot(Constants.LEFT, min);
         }
-        putOnRoot(vertex);
+        size++;
+    }
 
-        h.n++;
+    private void connect(Vertex v, Vertex w) {
+        w.addSlot(Constants.LEFT, v);
+        w.addSlot(Constants.RIGHT, right(v));
+        right(v).addSlot(Constants.LEFT, w);
+        v.addSlot(Constants.RIGHT, w);
+    }
+
+    private void disconnect(Vertex v) {
+        //1 <--> 0 <--> 5 => 1 <--> 5 ... 0
+        left(v).addSlot(Constants.RIGHT, right(v));
+        right(v).addSlot(Constants.LEFT, left(v));
+    }
+
+    private void addToRoot(Vertex v) {
+        if(min != null) {
+            connect(min, v);
+        }
     }
 
     public Vertex extractMin() {
-        if(h.min == null)
-            return null;
-
-        Vertex min = h.min;
-        Vertex child = child(min);
-        Vertex temp = null;
-        while(child != null) {
-            temp = right(child);
-            if(temp.getId() == child. getId()) {
-                min.addSlot(Constants.CHILD, null);
-                temp.addSlot(Constants.RIGHT, null);
-                temp.addSlot(Constants.LEFT, null);
-            } else {
-                removeFromRoot(temp);
-                putOnRoot(temp);
-                child = null;
+        Vertex minimun = this.min;
+        if(minimun != null) {
+            int children = degree(minimun);
+            Vertex child = child(minimun);
+            Vertex temp;
+            while(children > 0) {
+                temp = right(child);
+                disconnect(child);
+                addToRoot(child);
+                child.addSlot(Constants.PARENT, null);
+                child = temp;
+                children--;
             }
-            temp.addSlot(Constants.PARENT, null);
         }
+        // removes minimun from root
+        disconnect(minimun);
 
-        if(min.getId() == right(min).getId()) {
-            h.min = null;
-            h.root = null;
+        if(right(minimun).getId() == minimun.getId()) {
+            this.min = null;
         } else {
-            removeFromRoot(min);
+            this.min = right(minimun);
             consolidate();
         }
 
-        h.n--;
+        size--;
 
-        return min;
-    }
-
-    private void putOnRoot(Vertex vertex) {
-        if(h.root == null) {
-            h.root = vertex;
-            h.root.addSlot(Constants.RIGHT, vertex);
-            h.root.addSlot(Constants.LEFT, vertex);
-        } else {
-            Vertex temp = right(h.root);
-
-            h.root.addSlot(Constants.RIGHT, vertex);
-            vertex.addSlot(Constants.RIGHT, temp);
-
-            temp.addSlot(Constants.LEFT, vertex);
-            vertex.addSlot(Constants.LEFT, h.root);
-        }
-    }
-
-    private void removeFromRoot(Vertex v) {
-        Vertex temp = right(v);
-        temp.addSlot(Constants.LEFT, left(v));
-
-        temp = left(v);
-        temp.addSlot(Constants.RIGHT, right(v));
-
-        v.addSlot(Constants.LEFT, null);
-        v.addSlot(Constants.RIGHT, null);
-
-        if(h.root.getId() == v.getId()) {
-            h.root = temp;
-        }
-    }
-
-    private void consolidate() {
-        int dn = calculateD(h.n) + 1;
-        Vertex[] array = new Vertex[dn];
-        for(int i = 0 ; i < array.length ; i++) {
-            array[i] = null;
-        }
-
-        Vertex right = h.root;
-        do {
-            int degree = degree(right);
-            while(degree < array.length && degree > -1 && array[degree] != null) {
-                Vertex y = array[degree];
-                if(distance(right) > distance(y)) {
-                    swap(right, y);
-                }
-                heapLink(right, y);
-                array[degree] = null;
-                degree = degree + 1;
-            }
-            if(degree == array.length) {
-                degree--;
-            } else if (degree == -1) {
-                degree = 0;
-            }
-            array[degree] = right;
-            right = right(right);
-        } while(right.getId() != h.root.getId());
-        h.min = null;
-        h.root = null;
-        for(int i = 0 ; i < array.length ; i++) {
-            if(array[i] != null) {
-                h.n--;
-                insert(array[i]);
-            }
-        }
-    }
-
-    private void heapLink(Vertex x, Vertex y) {
-        removeFromRoot(y);
-
-        if(child(x) != null) {
-            Vertex child = child(x);
-            Vertex temp = right(child);
-
-            child.addSlot(Constants.RIGHT, y);
-            y.addSlot(Constants.RIGHT, temp);
-
-            temp.addSlot(Constants.LEFT, y);
-            y.addSlot(Constants.LEFT, child);
-        } else {
-            x.addSlot(Constants.CHILD, y);
-            y.addSlot(Constants.RIGHT, y);
-            y.addSlot(Constants.LEFT, y);
-        }
-        x.addSlot(Constants.DEGREE, degree(x) + 1);
-        y.addSlot(Constants.PARENT, x);
-        y.addSlot(Constants.MARK, false);
-    }
-
-    public boolean isEmpty() {
-        return h.n == 0;
-    }
-
-    public int getSize() {
-        return h.n;
-    }
-
-    public Vertex min() {
-        return h.min;
+        return minimun;
     }
 
     public void decreaseKey(Vertex x, double distance) {
@@ -194,28 +100,8 @@ public class FibonacciMinPriorityQueue {
             cut(x, y);
             cascadingCut(y);
         }
-        if (distance(x) < distance(h.min))
-            h.min = x;
-    }
-
-    private void cut(Vertex x, Vertex y) {
-        removeChild(x);
-        insert(x);
-        h.n--;
-        x.addSlot(Constants.PARENT, null);
-        x.addSlot(Constants.MARK, false);
-    }
-
-    private void cascadingCut(Vertex y) {
-        Vertex z = parent(y);
-        if (z != null) {
-            if (!marked(y))
-                y.addSlot(Constants.MARK, true);
-            else {
-                cut(y, z);
-                cascadingCut(z);
-            }
-        }
+        if (distance(x) < distance(this.min))
+            this.min = x;
     }
 
     private void removeChild(Vertex x) {
@@ -242,6 +128,120 @@ public class FibonacciMinPriorityQueue {
         x.addSlot(Constants.PARENT, null);
     }
 
+    private void cut(Vertex x, Vertex y) {
+//        removeChild(x);
+        disconnect(x);
+        y.addSlot(Constants.DEGREE, degree(y) - 1);
+
+        if(child(y).getId() == x.getId()) {
+            y.addSlot(Constants.CHILD, right(x));
+        }
+
+        if(degree(y) == 0) {
+            y.addSlot(Constants.CHILD, null);
+        }
+
+        addToRoot(x);
+
+        x.addSlot(Constants.PARENT, null);
+        x.addSlot(Constants.MARK, false);
+    }
+
+    private void cascadingCut(Vertex y) {
+        Vertex z = parent(y);
+        if (z != null) {
+            if (!marked(y))
+                y.addSlot(Constants.MARK, true);
+            else {
+                cut(y, z);
+                cascadingCut(z);
+            }
+        }
+    }
+
+    private void consolidate() {
+        int arraySize = calculateD();
+        ArrayList<Vertex> array = new ArrayList<>(arraySize);
+        for(int i = 0 ; i < arraySize ; i++) {
+            array.add(null);
+        }
+
+        // find how many roots I will iterate
+        int roots = 0;
+        Vertex root = this.min;
+        if(root != null) {
+            roots++;
+            root = right(root);
+            while(root.getId() != this.min.getId()) {
+                roots++;
+                root = right(root);
+            }
+        }
+
+        while(roots > 0) {
+            int degree = degree(root);
+            Vertex y = array.get(degree);
+
+            while(y != null) {
+                if(distance(root) > distance(y)) {
+                    exchange(root, y);
+                }
+                heapLink(root, y);
+                array.set(degree, null);
+                degree++;
+                if(degree < arraySize) {
+                    y = array.get(degree);
+                } else {
+                    y = null;
+                }
+            }
+            array.set(degree, root);
+            root = right(root);
+            roots--;
+        }
+
+        this.min = null;
+        for(int i = 0 ; i < arraySize ; i++) {
+            Vertex y = array.get(i);
+            if(y != null) {
+                if(this.min != null) {
+                    disconnect(y);
+                    addToRoot(y);
+                    if(distance(y) < distance(this.min)) {
+                        this.min = y;
+                    }
+                } else {
+                    this.min = y;
+                }
+            }
+        }
+    }
+
+    private void heapLink(Vertex x, Vertex y) {
+        disconnect(y);
+        y.addSlot(Constants.PARENT, x);
+        if(child(x) == null) {
+            x.addSlot(Constants.CHILD, y);
+            y.addSlot(Constants.LEFT, y);
+            y.addSlot(Constants.RIGHT, y);
+        } else {
+            connect(child(x), y);
+        }
+
+        x.addSlot(Constants.DEGREE, degree(x) + 1);
+        x.addSlot(Constants.MARK, false);
+    }
+
+    private void exchange(Vertex x, Vertex y) {
+        Vertex temp = y;
+        y = x;
+        x = temp;
+    }
+
+    private int calculateD() {
+        return ((int) (Math.log(size) / Math.log(this.constant))) + 1;
+    }
+
     private boolean marked(Vertex v) {
         return v.getSlot(Constants.MARK, Boolean.class);
     }
@@ -262,6 +262,10 @@ public class FibonacciMinPriorityQueue {
         return v.getSlot(Constants.LEFT, Vertex.class);
     }
 
+    private Double distance(Vertex v) {
+        return v.getSlot(Constants.ESTIMATIVE, Double.class);
+    }
+
     private int degree(Vertex v) {
         if(v.getSlot(Constants.DEGREE, Integer.class) == null) {
             return 0;
@@ -270,26 +274,7 @@ public class FibonacciMinPriorityQueue {
         }
     }
 
-    private int calculateD(int n) {
-        return (int) Math.log(n);
+    public boolean isEmpty() {
+        return size == 0;
     }
-
-    private Double distance(Vertex v) {
-        return v.getSlot(Constants.ESTIMATIVE, Double.class);
-    }
-
-    private void swap(Vertex x, Vertex y) {
-        Vertex temp = y;
-        y = x;
-        x = temp;
-    }
-
-    class FibonacciProperties {
-
-        private int n = 0;
-        private Vertex min = null;
-        private Vertex root = null;
-
-    }
-    
 }
