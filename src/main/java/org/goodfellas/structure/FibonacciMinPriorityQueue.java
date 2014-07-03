@@ -9,14 +9,12 @@ import org.goodfellas.util.Utils;
 public class FibonacciMinPriorityQueue {
     
     private FibonacciProperties h;
-    private int heapSize = 0;
     // this map was created to suppress the problem of swap,
     // when using the heap index to index vertexes.
     private Map<Integer, Integer> vertexHeapMap;
 
     public FibonacciMinPriorityQueue(Graph graph, Vertex source, Vertex destination) {
 
-        heapSize = graph.getNumVertices();
         vertexHeapMap = new HashMap<Integer, Integer>(graph.getNumVertices());
         h = new FibonacciProperties();
 
@@ -32,8 +30,6 @@ public class FibonacciMinPriorityQueue {
             if(v.getId() != source.getId())
                 insert(v);
         }
-
-        swap(source.getId(), 0);
     }
 
     public void insert(Vertex vertex) {
@@ -52,6 +48,39 @@ public class FibonacciMinPriorityQueue {
         h.n++;
     }
 
+    public Vertex extractMin() {
+        if(h.min == null)
+            return null;
+
+        Vertex min = h.min;
+        Vertex child = child(min);
+        Vertex temp = null;
+        while(child != null) {
+            temp = right(child);
+            if(temp.getId() == child. getId()) {
+                min.addSlot(Constants.CHILD, null);
+                temp.addSlot(Constants.RIGHT, null);
+                temp.addSlot(Constants.LEFT, null);
+            } else {
+                removeFromRoot(temp);
+                putOnRoot(temp);
+            }
+            temp.addSlot(Constants.PARENT, null);
+        }
+
+        if(min.getId() == right(min).getId()) {
+            h.min = null;
+            h.root = null;
+        } else {
+            removeFromRoot(min);
+            consolidate();
+        }
+
+        h.n--;
+
+        return min;
+    }
+
     private void putOnRoot(Vertex vertex) {
         if(h.root == null) {
             h.root = vertex;
@@ -68,26 +97,60 @@ public class FibonacciMinPriorityQueue {
         }
     }
 
+    private void removeFromRoot(Vertex v) {
+        Vertex temp = right(v);
+        temp.addSlot(Constants.LEFT, left(v));
+
+        temp = left(v);
+        temp.addSlot(Constants.RIGHT, right(v));
+
+        v.addSlot(Constants.LEFT, null);
+        v.addSlot(Constants.RIGHT, null);
+    }
+
+    private void consolidate() {
+        int dn = calculateD(h.n); // TODO - calculate
+        Vertex[] array = new Vertex[dn];
+        for(int i = 0 ; i < array.length ; i++) {
+            array[i] = null;
+        }
+
+        Vertex right = h.root;
+        do {
+            int degree = degree(right);
+            while(array[degree] != null) {
+                Vertex y = array[degree];
+                if(distance(right) > distance(y)) {
+                    swap(right, y);
+                }
+                heapLink(right, y);
+                degree = degree + 1;
+            }
+            array[degree] = right;
+            right = right(h.root);
+        } while(right.getId() != h.root.getId());
+        h.min = null;
+        h.root = null;
+        for(int i = 0 ; i < array.length ; i++) {
+            if(array[i] != null) {
+                insert(array[i]);
+            }
+        }
+    }
+
+    private void heapLink(Vertex x, Vertex y) {
+        removeFromRoot(y);
+        x.addSlot(Constants.CHILD, y);
+        x.addSlot(Constants.DEGREE, degree(x) + 1);
+        y.addSlot(Constants.MARK, false);
+    }
 
     public boolean isEmpty() {
-        return heapSize == 0;
+        return h.n == 0;
     }
 
     public int getSize() {
         return h.n;
-    }
-
-    public Vertex extractMin() {
-        if(h.min == null)
-            return null;
-
-        Vertex min = h.min;
-        Vertex child = child(min);
-        while(child != null) {
-//            if()
-        }
-
-        return null;
     }
 
     public Vertex min() {
@@ -175,12 +238,26 @@ public class FibonacciMinPriorityQueue {
         return v.getSlot(Constants.LEFT, Vertex.class);
     }
 
+    private int degree(Vertex v) {
+        if(v.getSlot(Constants.DEGREE, Integer.class) == null) {
+            return 0;
+        } else {
+            return v.getSlot(Constants.DEGREE, Integer.class);
+        }
+    }
+
+    private int calculateD(int n) {
+        return (int) Math.log(n);
+    }
+
     private Double distance(Vertex v) {
         return v.getSlot(Constants.ESTIMATIVE, Double.class);
     }
 
-    private void swap(int i, int j) {
-        // TODO
+    private void swap(Vertex x, Vertex y) {
+        Vertex temp = y;
+        y = x;
+        x = temp;
     }
 
     class FibonacciProperties {
