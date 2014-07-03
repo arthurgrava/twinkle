@@ -9,14 +9,12 @@ import org.goodfellas.util.Utils;
 public class FibonacciMinPriorityQueue {
     
     private FibonacciProperties h;
-    private int heapSize = 0;
     // this map was created to suppress the problem of swap,
     // when using the heap index to index vertexes.
     private Map<Integer, Integer> vertexHeapMap;
 
     public FibonacciMinPriorityQueue(Graph graph, Vertex source, Vertex destination) {
 
-        heapSize = graph.getNumVertices();
         vertexHeapMap = new HashMap<Integer, Integer>(graph.getNumVertices());
         h = new FibonacciProperties();
 
@@ -52,6 +50,39 @@ public class FibonacciMinPriorityQueue {
         h.n++;
     }
 
+    public Vertex extractMin() {
+        if(h.min == null)
+            return null;
+
+        Vertex min = h.min;
+        Vertex child = child(min);
+        Vertex temp = null;
+        while(child != null) {
+            temp = right(child);
+            if(temp.getId() == child. getId()) {
+                min.addSlot(Constants.CHILD, null);
+                temp.addSlot(Constants.RIGHT, null);
+                temp.addSlot(Constants.LEFT, null);
+            } else {
+                removeFromRoot(temp);
+                putOnRoot(temp);
+            }
+            temp.addSlot(Constants.PARENT, null);
+        }
+
+        if(min.getId() == right(min).getId()) {
+            h.min = null;
+            h.root = null;
+        } else {
+            removeFromRoot(min);
+            consolidate();
+        }
+
+        h.n--;
+
+        return min;
+    }
+
     private void putOnRoot(Vertex vertex) {
         if(h.root == null) {
             h.root = vertex;
@@ -68,26 +99,27 @@ public class FibonacciMinPriorityQueue {
         }
     }
 
+    private void removeFromRoot(Vertex v) {
+        Vertex temp = right(v);
+        temp.addSlot(Constants.LEFT, left(v));
+
+        temp = left(v);
+        temp.addSlot(Constants.RIGHT, right(v));
+
+        v.addSlot(Constants.LEFT, null);
+        v.addSlot(Constants.RIGHT, null);
+    }
+
+    private void consolidate() {
+
+    }
 
     public boolean isEmpty() {
-        return heapSize == 0;
+        return h.n == 0;
     }
 
     public int getSize() {
         return h.n;
-    }
-
-    public Vertex extractMin() {
-        if(h.min == null)
-            return null;
-
-        Vertex min = h.min;
-        Vertex child = child(min);
-        while(child != null) {
-//            if()
-        }
-
-        return null;
     }
 
     public Vertex min() {
