@@ -214,10 +214,6 @@ public class FibonacciMinPriorityQueue {
         x.addSlot(Constants.PARENT, null);
     }
 
-    private int degree(Vertex v) {
-        return v.getSlot(Constants.DEGREE, Integer.class);
-    }
-
     private boolean marked(Vertex v) {
         return v.getSlot(Constants.MARK, Boolean.class);
     }
