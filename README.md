@@ -19,10 +19,10 @@ $ mvn clean install
 
 ## Running the project
 ```
-$ java -jar target/twinkle-1.0.jar [PATH_TO_INPUT_FILE] [PERFORMANCE_TEST: true|false]
+$ java -jar target/twinkle-2.0.jar [PATH_TO_INPUT_FILE]
 ```
 examples:
 ```
-$ java -jar target/twinkle-1.0.jar input/one.txt
-$ java -jar target/twinkle-1.0.jar input/two.txt true
+$ java -jar target/twinkle-2.0.jar input/one.txt
+$ java -jar target/twinkle-2.0.jar input/two.txt true
 ```
