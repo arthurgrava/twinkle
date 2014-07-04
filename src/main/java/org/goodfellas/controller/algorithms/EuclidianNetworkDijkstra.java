@@ -21,12 +21,12 @@ public class EuclidianNetworkDijkstra implements ShortestPath {
         this.source = source;
         this.destination = destination;
     }
-    
+    int count = 0;
     @Override
     public void execute() {
-        while (!queue.isEmpty()) {
+        while (!queue.isEmpty()) {count++;
             Vertex u = queue.extractMin();
-            
+
             if(u.getId() == destination.getId())
                 break;
             

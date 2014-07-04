@@ -4,22 +4,24 @@ import org.goodfellas.util.Constants;
 import org.goodfellas.util.Utils;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class FibonacciMinPriorityQueue {
 
+    private int heapSize = -1;
     private Vertex min = null;
-    private int size = -1;
-    private final double phi = (1.0 + Math.sqrt(5)) / 2.0;
+    private double phi = (1.0 + Math.sqrt(5) / 2.0);
 
     public FibonacciMinPriorityQueue(Graph graph, Vertex source, Vertex destination) {
-        size = 0;
+        this.heapSize = 0;
 
         for (Vertex v : graph.getVertices().values()) {
             v.addSlot(Constants.PI, null);
             v.addSlot(Constants.DISTANCE, Double.MAX_VALUE);
             v.addSlot(Constants.ESTIMATIVE, Double.MAX_VALUE);
-            if(v.getId() != source.getId())
+            if(v.getId() != source.getId()) {
                 insert(v);
+            }
         }
 
         source.addSlot(Constants.ESTIMATIVE, Utils.euclidianDistance(source, destination));
@@ -27,256 +29,230 @@ public class FibonacciMinPriorityQueue {
         insert(source);
     }
 
-    public void insert(Vertex v) {
-        if(min != null) {
-            connect(min, v);
-            if(distance(min) > distance(v)) {
-                min = v;
+    public boolean isEmpty() {
+        return heapSize == 0;
+    }
+
+    public void insert(Vertex node) {
+        if (min != null) {
+            setLeft(node, min);
+            setRight(node, right(min));
+            setRight(min, node);
+            setLeft(right(node), node);
+
+            if (distance(node) < distance(min)) {
+                min = node;
             }
         } else {
-            min = v;
-            min.addSlot(Constants.RIGHT, min);
-            min.addSlot(Constants.LEFT, min);
+            min = node;
+            setLeft(min, min);
+            setRight(min, min);
         }
-        size++;
-    }
 
-    private void connect(Vertex v, Vertex w) {
-        w.addSlot(Constants.LEFT, v);
-        w.addSlot(Constants.RIGHT, right(v));
-        right(v).addSlot(Constants.LEFT, w);
-        v.addSlot(Constants.RIGHT, w);
-    }
-
-    private void disconnect(Vertex v) {
-        //1 <--> 0 <--> 5 => 1 <--> 5 ... 0
-        if(v == null) {
-            System.out.println("null");
-            return;
-        }
-        left(v).addSlot(Constants.RIGHT, right(v));
-        right(v).addSlot(Constants.LEFT, left(v));
-    }
-
-    private void addToRoot(Vertex v) {
-        if(min != null) {
-            connect(min, v);
-        }
+        heapSize++;
     }
 
     public Vertex extractMin() {
-        Vertex minimum = this.min;
+        Vertex z = min;
 
-        if(minimum == null) {
-            System.out.print("a");
+        if (z != null) {
+            int numChild = degree(z);
+            Vertex x = child(z);
+            Vertex curr;
+
+            while (numChild > 0) {
+                curr = right(x);
+
+                setRight(left(x), right(x));
+                setLeft(right(x), left(x));
+
+                setLeft(x, min);
+                setRight(x, right(min));
+                setRight(min, x);
+                setLeft(right(x), x);
+
+                setParent(x, null);
+                x = curr;
+                numChild--;
+            }
+
+            setRight(left(z), right(z));
+            setLeft(right(z), left(z));
+
+            if (z.getId() == right(z).getId()) {
+                min = null;
+            } else {
+                min = right(z);
+                consolidate();
+            }
+
+            heapSize--;
         }
 
-        if(minimum != null) {
-            int children = degree(minimum);
-            Vertex child = child(minimum);
-            Vertex temp;
-            while(children > 0) {
-                temp = right(child);
-                disconnect(child);
-                addToRoot(child);
-                child.addSlot(Constants.PARENT, null);
-                child = temp;
-                children--;
+        return z;
+    }
+
+    private void consolidate() {
+        int arraySize = getD();
+
+        List<Vertex> A = new ArrayList<>(arraySize);
+        for (int i = 0; i < arraySize; i++) {
+            A.add(null);
+        }
+
+        int numRoots = 0;
+        Vertex x = min;
+
+        if (x != null) {
+            numRoots++;
+            x = right(x);
+
+            while (x.getId() != min.getId()) {
+                numRoots++;
+                x = right(x);
             }
         }
-        // removes minimum from root
-        disconnect(minimum);
 
-        if(minimum == null || right(minimum).getId() == minimum.getId()) {
-            this.min = null;
-        } else {
-            this.min = right(minimum);
-            consolidate();
+        while (numRoots > 0) {
+            int d = degree(x);
+            Vertex next = right(x);
+
+            if(d >= arraySize)
+                d = arraySize - 1;
+
+            Vertex y = A.get(d);
+            while (y != null && d < arraySize) {
+                y = A.get(d);
+
+                if(y == null)
+                    break;
+
+                if (distance(x) > distance(y)) {
+                    Vertex temp = y;
+                    y = x;
+                    x = temp;
+                }
+
+                heapLink(y, x);
+
+                A.set(d, null);
+                d++;
+            }
+
+            if(d == arraySize)
+                d--;
+
+            A.set(d, x);
+
+            x = next;
+            numRoots--;
         }
 
-        size--;
+        min = null;
 
-        return minimum;
+        for (int i = 0; i < arraySize; i++) {
+            Vertex y = A.get(i);
+            if (y == null) {
+                continue;
+            }
+
+            if (min != null) {
+                setRight(left(y), right(y));
+                setLeft(right(y), left(y));
+
+                setLeft(y, min);
+                setRight(y, right(min));
+                setRight(min, y);
+                setLeft(right(y), y);
+
+                if (distance(y) < distance(min)) {
+                    min = y;
+                }
+            } else {
+                min = y;
+            }
+        }
+    }
+
+
+    private void heapLink(Vertex y, Vertex x) {
+        setRight(left(y), right(y));
+        setLeft(right(y), left(y));
+
+        setParent(y, x);
+
+        if (child(x) == null) {
+            setChild(x, y);
+            setRight(y, y);
+            setLeft(y, y);
+        } else {
+            setLeft(y, child(x));
+            setRight(y, right(child(x)));
+            setRight(child(x), y);
+            setLeft(right(y), y);
+        }
+
+        setDegree(x, degree(x) + 1);
+
+        setMarked(y, false);
     }
 
     public void decreaseKey(Vertex x, double distance) {
-        if (distance > distance(x))
-            throw new IllegalArgumentException("Distance can't be greater than the actual distance in v.");
+        if (distance > distance(x)) {
+            throw new IllegalArgumentException("decreaseKey() got larger key value");
+        }
 
-        x.addSlot(Constants.ESTIMATIVE, distance);
+        setDistance(x, distance);
+
         Vertex y = parent(x);
-        if (y != null && distance(x) < distance(y)) {
+
+        if ((y != null) && (distance(x) < distance(y))) {
             cut(x, y);
             cascadingCut(y);
         }
-        if(this.min == null || distance(x) == null || distance(this.min) == null) {
-            System.out.println();
+
+        if (distance(x) < distance(min)) {
+            min = x;
         }
-        if (distance(x) < distance(this.min))
-            this.min = x;
-    }
-
-    private void removeChild(Vertex x) {
-        Vertex y = parent(x);
-        y.addSlot(Constants.CHILD, null);
-
-        y.addSlot(Constants.DEGREE, Math.min(0, degree(y)-1));
-
-        // fix parent pointer to child
-        if (right(x).getId() != x.getId()) {
-            y.addSlot(Constants.CHILD, right(x));
-        }
-
-        // fix linked list pointers
-        Vertex l = left(x);
-        Vertex r = right(x);
-        r.addSlot(Constants.LEFT, l);
-        l.addSlot(Constants.RIGHT, r);
-
-        x.addSlot(Constants.LEFT, null);
-        x.addSlot(Constants.RIGHT, null);
-        x.addSlot(Constants.PARENT, null);
     }
 
     private void cut(Vertex x, Vertex y) {
-//        removeChild(x);
-        if (right(x).getId() != x.getId()) {
-            y.addSlot(Constants.CHILD, right(x));
-        }
-        disconnect(x);
-        y.addSlot(Constants.DEGREE, Math.min(0, degree(y)-1));
+        setRight(left(x), right(x));
+        setLeft(right(x), left(x));
+        setDegree(y, degree(y)-1);
 
-        if(degree(y) == 0) {
-            y.addSlot(Constants.CHILD, null);
-        }
+        if (child(y).getId() == x.getId())
+            setChild(y, right(x));
 
-        addToRoot(x);
+        if (degree(y) == 0)
+            setChild(y, null);
 
-        x.addSlot(Constants.PARENT, null);
-        x.addSlot(Constants.MARK, false);
+        // add x to root list of heap
+        setLeft(x, min);
+        setRight(x, right(min));
+        setRight(min, x);
+        setLeft(right(x), x);
+
+        setParent(x, null);
+
+        setMarked(x, false);
     }
 
     private void cascadingCut(Vertex y) {
         Vertex z = parent(y);
+
         if (z != null) {
-            if (!marked(y))
-                y.addSlot(Constants.MARK, true);
-            else {
+            if (!marked(y)) {
+                setMarked(y, true);
+            } else {
                 cut(y, z);
                 cascadingCut(z);
             }
         }
     }
 
-    private void consolidate() {
-        int arraySize = calculateD();
-        ArrayList<Vertex> array = new ArrayList<>(arraySize);
-        for(int i = 0 ; i < arraySize ; i++) {
-            array.add(null);
-        }
-
-        // find how many roots I will iterate
-        int roots = 0;
-        Vertex root = this.min;
-        if(root != null) {
-            roots++;
-            root = right(root);
-            while(root.getId() != this.min.getId()) {
-                roots++;
-                root = right(root);
-            }
-        }
-
-        while(roots > 0) {
-            int degree = degree(root);
-            if(degree <= -1) {
-                degree = 0;
-            }
-            Vertex y = array.get(degree);
-
-            while(y != null) {
-                if(distance(root) > distance(y)) {
-                    exchange(root, y);
-                }
-                heapLink(root, y);
-                array.set(degree, null);
-                degree++;
-//                if(degree < arraySize) {
-                y = array.get(degree);
-//                } else {
-//                    y = null;
-//                }
-            }
-            array.set(degree, root);
-            root = right(root);
-            roots--;
-        }
-
-        this.min = null;
-        for(int i = 0 ; i < arraySize ; i++) {
-            Vertex y = array.get(i);
-            if(y != null) {
-                if(this.min != null) {
-                    disconnect(y);
-//                    Vertex parent = parent(y);
-//                    if(parent != null && child(parent).getId() == y.getId()) {
-//                        if(right(y) != null && right(y).getId() != y.getId()) {
-//                            parent.addSlot(Constants.CHILD, right(y));
-//                        } else {
-//                            parent.addSlot(Constants.CHILD, null);
-//                        }
-//                    }
-                    y.addSlot(Constants.PARENT, null);
-                    addToRoot(y);
-                    if(distance(y) < distance(this.min)) {
-                        this.min = y;
-                    }
-                } else {
-                    this.min = y;
-                }
-            }
-        }
-        if(this.min == null) {
-            System.out.println();
-        }
-    }
-
-    private void heapLink(Vertex x, Vertex y) {
-        disconnect(y);
-        y.addSlot(Constants.PARENT, x);
-        if(child(x) == null) {
-            x.addSlot(Constants.CHILD, y);
-            y.addSlot(Constants.LEFT, y);
-            y.addSlot(Constants.RIGHT, y);
-        } else {
-            connect(child(x), y);
-        }
-
-        x.addSlot(Constants.DEGREE, degree(x) + 1);
-        x.addSlot(Constants.MARK, false);
-    }
-
-    private void exchange(Vertex x, Vertex y) {
-        Vertex temp = y;
-        y = x;
-        x = temp;
-    }
-
-    // page 523 Cormen - 3rd edition (chapter 19.4 - Bounding the maximum degree)
-    private int calculateD() {
-        return ((int) (Math.log(size) / Math.log(this.phi))) + 1;
-    }
-
-    private boolean marked(Vertex v) {
-        return v.getSlot(Constants.MARK, Boolean.class);
-    }
-
-    private Vertex child(Vertex v) {
-        return v.getSlot(Constants.CHILD, Vertex.class);
-    }
-
-    private Vertex parent(Vertex v) {
-        return v.getSlot(Constants.PARENT, Vertex.class);
+    private int getD() {
+        return ((int) Math.floor(Math.log(heapSize) / Math.log(phi))) + 1;
     }
 
     private Vertex right(Vertex v) {
@@ -287,19 +263,56 @@ public class FibonacciMinPriorityQueue {
         return v.getSlot(Constants.LEFT, Vertex.class);
     }
 
-    private Double distance(Vertex v) {
-        return v.getSlot(Constants.ESTIMATIVE, Double.class);
+    private Vertex parent(Vertex v) {
+        return v.getSlot(Constants.PARENT, Vertex.class);
+    }
+
+    private Vertex child(Vertex v) {
+        return v.getSlot(Constants.CHILD, Vertex.class);
+    }
+
+    private boolean marked(Vertex v) {
+        Boolean mark = v.getSlot(Constants.MARK, Boolean.class);
+        return mark == null ? false : mark;
+    }
+
+    private double distance(Vertex v) {
+        Double dist = v.getSlot(Constants.ESTIMATIVE, Double.class);
+        return dist == null ? Double.MAX_VALUE : dist;
     }
 
     private int degree(Vertex v) {
-        if(v.getSlot(Constants.DEGREE, Integer.class) == null) {
-            return 0;
-        } else {
-            return v.getSlot(Constants.DEGREE, Integer.class);
-        }
+        Integer d = v.getSlot(Constants.DEGREE, Integer.class);
+        return d == null ? 0 : d;
     }
 
-    public boolean isEmpty() {
-        return size == 0;
+
+    private void setRight(Vertex v, Vertex r) {
+        v.addSlot(Constants.RIGHT, r);
     }
+
+    private void setLeft(Vertex v, Vertex l) {
+        v.addSlot(Constants.LEFT, l);
+    }
+
+    private void setParent(Vertex v, Vertex p) {
+        v.addSlot(Constants.PARENT, p);
+    }
+
+    private void setChild(Vertex v, Vertex c) {
+        v.addSlot(Constants.CHILD, c);
+    }
+
+    private void setMarked(Vertex v, boolean m) {
+        v.addSlot(Constants.MARK, m);
+    }
+
+    private void setDistance(Vertex v, double d) {
+        v.addSlot(Constants.ESTIMATIVE, d);
+    }
+
+    private void setDegree(Vertex v, int degree) {
+        v.addSlot(Constants.DEGREE, degree);
+    }
+
 }

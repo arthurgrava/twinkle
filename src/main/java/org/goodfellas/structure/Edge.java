@@ -44,4 +44,9 @@ public class Edge {
     public String toString() {
         return from.getId() + " -- " + this.distance + " -> " + to.getId();
     }
+
+    public static void main(String[] args) {
+        Boolean d = null;
+        System.out.println(d);
+    }
 }
